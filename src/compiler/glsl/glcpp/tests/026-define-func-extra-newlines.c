@@ -1,6 +1,5 @@
-#define foo(a) bar
-
-foo
-(
-1
-)
+   #define foo(a) bar
+      foo
+   (
+   1
+   )

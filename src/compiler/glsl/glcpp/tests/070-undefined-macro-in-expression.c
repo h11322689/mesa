@@ -1,5 +1,5 @@
-#if UNDEFINED_MACRO
-Failure
-#else
-Success
-#endif
+   #if UNDEFINED_MACRO
+   Failure
+   #else
+   Success
+   #endif

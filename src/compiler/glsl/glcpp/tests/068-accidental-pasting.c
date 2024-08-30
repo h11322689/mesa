@@ -1,11 +1,11 @@
-#define empty
-<empty<
-<empty=
->empty>
->empty=
-=empty=
-!empty=
-&empty&
-|empty|
-+empty+
--empty-
+   #define empty
+   <empty<
+   <empty=
+   >empty>
+   >empty=
+   =empty=
+   !empty=
+   &empty&
+   |empty|
+   +empty+
+   -empty-

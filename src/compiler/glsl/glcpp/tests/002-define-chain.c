@@ -1,3 +1,3 @@
-#define foo 1
-#define bar foo
-bar
+   #define foo 1
+   #define bar foo
+   bar

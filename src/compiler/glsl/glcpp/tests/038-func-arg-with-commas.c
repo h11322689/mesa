@@ -1,2 +1,2 @@
-#define foo(x) success
-foo(argument (with,embedded , commas) -- tricky)
+   #define foo(x) success
+   foo(argument (with,embedded , commas) -- tricky)

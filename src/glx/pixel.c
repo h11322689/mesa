@@ -1,14 +1,12 @@
-/*
- * SGI FREE SOFTWARE LICENSE B (Version 2.0, Sept. 18, 2008)
- * Copyright (C) 1991-2000 Silicon Graphics, Inc. All Rights Reserved.
- *
- * SPDX-License-Identifier: SGI-B-2.0
- */
-
-#include "packrender.h"
-
-static const GLubyte MsbToLsbTable[256] = {
-   0x00, 0x80, 0x40, 0xc0, 0x20, 0xa0, 0x60, 0xe0,
+   /*
+   * SGI FREE SOFTWARE LICENSE B (Version 2.0, Sept. 18, 2008)
+   * Copyright (C) 1991-2000 Silicon Graphics, Inc. All Rights Reserved.
+   *
+   * SPDX-License-Identifier: SGI-B-2.0
+   */
+      #include "packrender.h"
+      static const GLubyte MsbToLsbTable[256] = {
+      0x00, 0x80, 0x40, 0xc0, 0x20, 0xa0, 0x60, 0xe0,
    0x10, 0x90, 0x50, 0xd0, 0x30, 0xb0, 0x70, 0xf0,
    0x08, 0x88, 0x48, 0xc8, 0x28, 0xa8, 0x68, 0xe8,
    0x18, 0x98, 0x58, 0xd8, 0x38, 0xb8, 0x78, 0xf8,
@@ -39,28 +37,20 @@ static const GLubyte MsbToLsbTable[256] = {
    0x07, 0x87, 0x47, 0xc7, 0x27, 0xa7, 0x67, 0xe7,
    0x17, 0x97, 0x57, 0xd7, 0x37, 0xb7, 0x77, 0xf7,
    0x0f, 0x8f, 0x4f, 0xcf, 0x2f, 0xaf, 0x6f, 0xef,
-   0x1f, 0x9f, 0x5f, 0xdf, 0x3f, 0xbf, 0x7f, 0xff,
-};
-
-static const GLubyte LowBitsMask[9] = {
-   0x00, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff,
-};
-
-static const GLubyte HighBitsMask[9] = {
-   0x00, 0x80, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc, 0xfe, 0xff,
-};
-
-
-/*
-** Copy bitmap data from clients packed memory applying unpacking modes as the
-** data is transferred into the destImage buffer.  Return in modes the
-** set of pixel modes that are to be done by the server.
-*/
-static void
-FillBitmap(struct glx_context * gc, GLint width, GLint height,
-           GLenum format, const GLvoid * userdata, GLubyte * destImage)
-{
-   const __GLXattribute *state = gc->client_state_private;
+      };
+      static const GLubyte LowBitsMask[9] = {
+         };
+      static const GLubyte HighBitsMask[9] = {
+         };
+         /*
+   ** Copy bitmap data from clients packed memory applying unpacking modes as the
+   ** data is transferred into the destImage buffer.  Return in modes the
+   ** set of pixel modes that are to be done by the server.
+   */
+   static void
+   FillBitmap(struct glx_context * gc, GLint width, GLint height,
+         {
+      const __GLXattribute *state = gc->client_state_private;
    GLint rowLength = state->storeUnpack.rowLength;
    GLint alignment = state->storeUnpack.alignment;
    GLint skipPixels = state->storeUnpack.skipPixels;
@@ -69,80 +59,59 @@ FillBitmap(struct glx_context * gc, GLint width, GLint height,
    GLint elementsLeft, bitOffset, currentByte, nextByte, highBitMask;
    GLint lowBitMask, i;
    GLint components, groupsPerRow, rowSize, padding, elementsPerRow;
-   const GLubyte *start, *iter;
-
-   if (rowLength > 0) {
-      groupsPerRow = rowLength;
-   }
+            if (rowLength > 0) {
+         }
    else {
-      groupsPerRow = width;
-   }
+         }
    components = __glElementsPerGroup(format, GL_BITMAP);
    rowSize = (groupsPerRow * components + 7) >> 3;
    padding = (rowSize % alignment);
    if (padding) {
-      rowSize += alignment - padding;
-   }
+         }
    start = ((const GLubyte *) userdata) + skipRows * rowSize +
-      ((skipPixels * components) >> 3);
-   bitOffset = (skipPixels * components) & 7;
+         bitOffset = (skipPixels * components) & 7;
    highBitMask = LowBitsMask[8 - bitOffset];
    lowBitMask = HighBitsMask[bitOffset];
    elementsPerRow = width * components;
    for (i = 0; i < height; i++) {
       elementsLeft = elementsPerRow;
-      iter = start;
-      while (elementsLeft) {
-         /* First retrieve low bits from current byte */
-         if (lsbFirst) {
-            currentByte = MsbToLsbTable[iter[0]];
+   iter = start;
+   while (elementsLeft) {
+      /* First retrieve low bits from current byte */
+   if (lsbFirst) {
          }
-         else {
-            currentByte = iter[0];
+   else {
          }
-         if (bitOffset) {
-            /* Need to read next byte to finish current byte */
-            if (elementsLeft > (8 - bitOffset)) {
-               if (lsbFirst) {
-                  nextByte = MsbToLsbTable[iter[1]];
-               }
-               else {
-                  nextByte = iter[1];
-               }
-               currentByte =
-                  ((currentByte & highBitMask) << bitOffset) |
-                  ((nextByte & lowBitMask) >> (8 - bitOffset));
-            }
-            else {
-               currentByte = ((currentByte & highBitMask) << bitOffset);
-            }
+   if (bitOffset) {
+      /* Need to read next byte to finish current byte */
+   if (elementsLeft > (8 - bitOffset)) {
+      if (lsbFirst) {
          }
-         if (elementsLeft >= 8) {
-            *destImage = currentByte;
-            elementsLeft -= 8;
+   else {
          }
-         else {
-            *destImage = currentByte & HighBitsMask[elementsLeft];
-            elementsLeft = 0;
-         }
-         destImage++;
-         iter++;
-      }
-      start += rowSize;
+   currentByte =
+      ((currentByte & highBitMask) << bitOffset) |
    }
-}
-
-/*
-** Extract array from user's data applying all pixel store modes.
-** The internal packed array format used has LSB_FIRST = FALSE and 
-** ALIGNMENT = 1.
-*/
-void
-__glFillImage(struct glx_context * gc, GLint dim, GLint width, GLint height,
-              GLint depth, GLenum format, GLenum type,
-              const GLvoid * userdata, GLubyte * newimage, GLubyte * modes)
-{
-   const __GLXattribute *state = gc->client_state_private;
+   else {
+            }
+   if (elementsLeft >= 8) {
+      *destImage = currentByte;
+      }
+   else {
+      *destImage = currentByte & HighBitsMask[elementsLeft];
+      }
+   destImage++;
+      }
+         }
+      /*
+   ** Extract array from user's data applying all pixel store modes.
+   ** The internal packed array format used has LSB_FIRST = FALSE and 
+   ** ALIGNMENT = 1.
+   */
+   void
+   __glFillImage(struct glx_context * gc, GLint dim, GLint width, GLint height,
+               {
+      const __GLXattribute *state = gc->client_state_private;
    GLint rowLength = state->storeUnpack.rowLength;
    GLint imageHeight = state->storeUnpack.imageHeight;
    GLint alignment = state->storeUnpack.alignment;
@@ -153,102 +122,67 @@ __glFillImage(struct glx_context * gc, GLint dim, GLint width, GLint height,
    GLint components, elementSize, rowSize, padding, groupsPerRow, groupSize;
    GLint elementsPerRow, imageSize, rowsPerImage, h, i, j, k;
    const GLubyte *start, *iter, *itera, *iterb, *iterc;
-   GLubyte *iter2;
-
-   if (type == GL_BITMAP) {
-      FillBitmap(gc, width, height, format, userdata, newimage);
-   }
+            if (type == GL_BITMAP) {
+         }
    else {
       components = __glElementsPerGroup(format, type);
-      if (rowLength > 0) {
-         groupsPerRow = rowLength;
-      }
-      else {
-         groupsPerRow = width;
-      }
-      if (imageHeight > 0) {
-         rowsPerImage = imageHeight;
-      }
-      else {
-         rowsPerImage = height;
-      }
-
-      elementSize = __glBytesPerElement(type);
-      groupSize = elementSize * components;
-      if (elementSize == 1)
-         swapBytes = 0;
-
-      rowSize = groupsPerRow * groupSize;
-      padding = (rowSize % alignment);
-      if (padding) {
-         rowSize += alignment - padding;
-      }
-      imageSize = rowSize * rowsPerImage;
-      start = ((const GLubyte *) userdata) + skipImages * imageSize +
-         skipRows * rowSize + skipPixels * groupSize;
-      iter2 = newimage;
-      elementsPerRow = width * components;
-
-      if (swapBytes) {
-         itera = start;
-         for (h = 0; h < depth; h++) {
-            iterb = itera;
-            for (i = 0; i < height; i++) {
-               iterc = iterb;
-               for (j = 0; j < elementsPerRow; j++) {
-                  for (k = 1; k <= elementSize; k++) {
-                     iter2[k - 1] = iterc[elementSize - k];
-                  }
-                  iter2 += elementSize;
-                  iterc += elementSize;
-               }
-               iterb += rowSize;
-            }
-            itera += imageSize;
+   if (rowLength > 0) {
          }
-      }
-      else {
-         itera = start;
-         for (h = 0; h < depth; h++) {
-            if (rowSize == elementsPerRow * elementSize) {
-               /* Ha!  This is mondo easy! */
-               __GLX_MEM_COPY(iter2, itera,
-                              elementsPerRow * elementSize * height);
-               iter2 += elementsPerRow * elementSize * height;
-            }
-            else {
-               iter = itera;
-               for (i = 0; i < height; i++) {
-                  __GLX_MEM_COPY(iter2, iter, elementsPerRow * elementSize);
-                  iter2 += elementsPerRow * elementSize;
-                  iter += rowSize;
-               }
-            }
-            itera += imageSize;
+   else {
          }
+   if (imageHeight > 0) {
+         }
+   else {
+                  elementSize = __glBytesPerElement(type);
+   groupSize = elementSize * components;
+   if (elementSize == 1)
+            rowSize = groupsPerRow * groupSize;
+   padding = (rowSize % alignment);
+   if (padding) {
+         }
+   imageSize = rowSize * rowsPerImage;
+   start = ((const GLubyte *) userdata) + skipImages * imageSize +
+         iter2 = newimage;
+            if (swapBytes) {
+      itera = start;
+   for (h = 0; h < depth; h++) {
+      iterb = itera;
+   for (i = 0; i < height; i++) {
+      iterc = iterb;
+   for (j = 0; j < elementsPerRow; j++) {
+      for (k = 1; k <= elementSize; k++) {
+         }
+   iter2 += elementSize;
       }
-   }
-
-   /* Setup store modes that describe what we just did */
+      }
+         }
+   else {
+      itera = start;
+   for (h = 0; h < depth; h++) {
+      if (rowSize == elementsPerRow * elementSize) {
+      /* Ha!  This is mondo easy! */
+   __GLX_MEM_COPY(iter2, itera,
+            }
+   else {
+      iter = itera;
+   for (i = 0; i < height; i++) {
+      __GLX_MEM_COPY(iter2, iter, elementsPerRow * elementSize);
+   iter2 += elementsPerRow * elementSize;
+         }
+                     /* Setup store modes that describe what we just did */
    if (modes) {
       if (dim < 3) {
-         (void) memcpy(modes, __glXDefaultPixelStore + 4, 20);
-      }
-      else {
-         (void) memcpy(modes, __glXDefaultPixelStore + 0, 36);
-      }
-   }
-}
-
-/*
-** Empty a bitmap in LSB_FIRST=GL_FALSE and ALIGNMENT=4 format packing it
-** into the clients memory using the pixel store PACK modes.
-*/
-static void
-EmptyBitmap(struct glx_context * gc, GLint width, GLint height,
-            GLenum format, const GLubyte * sourceImage, GLvoid * userdata)
-{
-   const __GLXattribute *state = gc->client_state_private;
+         }
+   else {
+               }
+      /*
+   ** Empty a bitmap in LSB_FIRST=GL_FALSE and ALIGNMENT=4 format packing it
+   ** into the clients memory using the pixel store PACK modes.
+   */
+   static void
+   EmptyBitmap(struct glx_context * gc, GLint width, GLint height,
+         {
+      const __GLXattribute *state = gc->client_state_private;
    GLint rowLength = state->storePack.rowLength;
    GLint alignment = state->storePack.alignment;
    GLint skipPixels = state->storePack.skipPixels;
@@ -259,117 +193,78 @@ EmptyBitmap(struct glx_context * gc, GLint width, GLint height,
    GLubyte *start, *iter;
    GLint elementsLeft, bitOffset, currentByte, highBitMask, lowBitMask;
    GLint writeMask, i;
-   GLubyte writeByte;
-
-   components = __glElementsPerGroup(format, GL_BITMAP);
+            components = __glElementsPerGroup(format, GL_BITMAP);
    if (rowLength > 0) {
-      groupsPerRow = rowLength;
-   }
+         }
    else {
-      groupsPerRow = width;
-   }
-
-   rowSize = (groupsPerRow * components + 7) >> 3;
+                  rowSize = (groupsPerRow * components + 7) >> 3;
    padding = (rowSize % alignment);
    if (padding) {
-      rowSize += alignment - padding;
-   }
+         }
    sourceRowSize = (width * components + 7) >> 3;
    sourcePadding = (sourceRowSize % 4);
    if (sourcePadding) {
-      sourceSkip = 4 - sourcePadding;
-   }
+         }
    else {
-      sourceSkip = 0;
-   }
+         }
    start = ((GLubyte *) userdata) + skipRows * rowSize +
-      ((skipPixels * components) >> 3);
-   bitOffset = (skipPixels * components) & 7;
+         bitOffset = (skipPixels * components) & 7;
    highBitMask = LowBitsMask[8 - bitOffset];
    lowBitMask = HighBitsMask[bitOffset];
    elementsPerRow = width * components;
    for (i = 0; i < height; i++) {
       elementsLeft = elementsPerRow;
-      iter = start;
-      writeMask = highBitMask;
-      writeByte = 0;
-      while (elementsLeft) {
-         /* Set up writeMask (to write to current byte) */
-         if (elementsLeft + bitOffset < 8) {
-            /* Need to trim writeMask */
-            writeMask &= HighBitsMask[bitOffset + elementsLeft];
+   iter = start;
+   writeMask = highBitMask;
+   writeByte = 0;
+   while (elementsLeft) {
+      /* Set up writeMask (to write to current byte) */
+   if (elementsLeft + bitOffset < 8) {
+      /* Need to trim writeMask */
+               if (lsbFirst) {
          }
-
-         if (lsbFirst) {
-            currentByte = MsbToLsbTable[iter[0]];
+   else {
+                  if (bitOffset) {
+      writeByte |= (sourceImage[0] >> bitOffset);
+   currentByte = (currentByte & ~writeMask) |
+            }
+   else {
+      currentByte = (currentByte & ~writeMask) |
+               if (lsbFirst) {
          }
-         else {
-            currentByte = iter[0];
+   else {
+                  if (elementsLeft >= 8) {
          }
-
-         if (bitOffset) {
-            writeByte |= (sourceImage[0] >> bitOffset);
-            currentByte = (currentByte & ~writeMask) |
-               (writeByte & writeMask);
-            writeByte = (sourceImage[0] << (8 - bitOffset));
+   else {
          }
-         else {
-            currentByte = (currentByte & ~writeMask) |
-               (sourceImage[0] & writeMask);
-         }
-
-         if (lsbFirst) {
-            iter[0] = MsbToLsbTable[currentByte];
-         }
-         else {
-            iter[0] = currentByte;
-         }
-
-         if (elementsLeft >= 8) {
-            elementsLeft -= 8;
-         }
-         else {
-            elementsLeft = 0;
-         }
-         sourceImage++;
-         iter++;
-         writeMask = 0xff;
+   sourceImage++;
+   iter++;
       }
-      if (writeByte) {
-         /* Some data left over that still needs writing */
-         writeMask &= lowBitMask;
-         if (lsbFirst) {
-            currentByte = MsbToLsbTable[iter[0]];
+   if (writeByte) {
+      /* Some data left over that still needs writing */
+   writeMask &= lowBitMask;
+   if (lsbFirst) {
          }
-         else {
-            currentByte = iter[0];
+   else {
          }
-         currentByte = (currentByte & ~writeMask) | (writeByte & writeMask);
-         if (lsbFirst) {
-            iter[0] = MsbToLsbTable[currentByte];
+   currentByte = (currentByte & ~writeMask) | (writeByte & writeMask);
+   if (lsbFirst) {
          }
-         else {
-            iter[0] = currentByte;
+   else {
+            }
+   start += rowSize;
          }
-      }
-      start += rowSize;
-      sourceImage += sourceSkip;
-   }
-}
-
-/*
-** Insert array into user's data applying all pixel store modes.
-** The packed array format from the server is LSB_FIRST = FALSE,
-** SWAP_BYTES = the current pixel storage pack mode, and ALIGNMENT = 4.
-** Named __glEmptyImage() because it is the opposite of __glFillImage().
-*/
-/* ARGSUSED */
-void
-__glEmptyImage(struct glx_context * gc, GLint dim, GLint width, GLint height,
-               GLint depth, GLenum format, GLenum type,
-               const GLubyte * sourceImage, GLvoid * userdata)
-{
-   const __GLXattribute *state = gc->client_state_private;
+      /*
+   ** Insert array into user's data applying all pixel store modes.
+   ** The packed array format from the server is LSB_FIRST = FALSE,
+   ** SWAP_BYTES = the current pixel storage pack mode, and ALIGNMENT = 4.
+   ** Named __glEmptyImage() because it is the opposite of __glFillImage().
+   */
+   /* ARGSUSED */
+   void
+   __glEmptyImage(struct glx_context * gc, GLint dim, GLint width, GLint height,
+               {
+      const __GLXattribute *state = gc->client_state_private;
    GLint rowLength = state->storePack.rowLength;
    GLint imageHeight = state->storePack.imageHeight;
    GLint alignment = state->storePack.alignment;
@@ -379,60 +274,40 @@ __glEmptyImage(struct glx_context * gc, GLint dim, GLint width, GLint height,
    GLint components, elementSize, rowSize, padding, groupsPerRow, groupSize;
    GLint elementsPerRow, sourceRowSize, sourcePadding, h, i;
    GLint imageSize, rowsPerImage;
-   GLubyte *start, *iter, *itera;
-
-   if (type == GL_BITMAP) {
-      EmptyBitmap(gc, width, height, format, sourceImage, userdata);
-   }
+            if (type == GL_BITMAP) {
+         }
    else {
       components = __glElementsPerGroup(format, type);
-      if (rowLength > 0) {
-         groupsPerRow = rowLength;
-      }
-      else {
-         groupsPerRow = width;
-      }
-      if (imageHeight > 0) {
-         rowsPerImage = imageHeight;
-      }
-      else {
-         rowsPerImage = height;
-      }
-      elementSize = __glBytesPerElement(type);
-      groupSize = elementSize * components;
-      rowSize = groupsPerRow * groupSize;
-      padding = (rowSize % alignment);
-      if (padding) {
-         rowSize += alignment - padding;
-      }
-      sourceRowSize = width * groupSize;
-      sourcePadding = (sourceRowSize % 4);
-      if (sourcePadding) {
-         sourceRowSize += 4 - sourcePadding;
-      }
-      imageSize = sourceRowSize * rowsPerImage;
-      start = ((GLubyte *) userdata) + skipImages * imageSize +
-         skipRows * rowSize + skipPixels * groupSize;
-      elementsPerRow = width * components;
-
-      itera = start;
-      for (h = 0; h < depth; h++) {
-         if ((rowSize == sourceRowSize) && (sourcePadding == 0)) {
-            /* Ha!  This is mondo easy! */
-            __GLX_MEM_COPY(itera, sourceImage,
-                           elementsPerRow * elementSize * height);
-            sourceImage += elementsPerRow * elementSize * height;
+   if (rowLength > 0) {
          }
-         else {
-            iter = itera;
-            for (i = 0; i < height; i++) {
-               __GLX_MEM_COPY(iter, sourceImage,
-                              elementsPerRow * elementSize);
-               sourceImage += sourceRowSize;
-               iter += rowSize;
+   else {
+         }
+   if (imageHeight > 0) {
+         }
+   else {
+         }
+   elementSize = __glBytesPerElement(type);
+   groupSize = elementSize * components;
+   rowSize = groupsPerRow * groupSize;
+   padding = (rowSize % alignment);
+   if (padding) {
+         }
+   sourceRowSize = width * groupSize;
+   sourcePadding = (sourceRowSize % 4);
+   if (sourcePadding) {
+         }
+   imageSize = sourceRowSize * rowsPerImage;
+   start = ((GLubyte *) userdata) + skipImages * imageSize +
+                  itera = start;
+   for (h = 0; h < depth; h++) {
+      if ((rowSize == sourceRowSize) && (sourcePadding == 0)) {
+      /* Ha!  This is mondo easy! */
+   __GLX_MEM_COPY(itera, sourceImage,
             }
+   else {
+      iter = itera;
+   for (i = 0; i < height; i++) {
+      __GLX_MEM_COPY(iter, sourceImage,
+         sourceImage += sourceRowSize;
          }
-         itera += imageSize;
-      }
-   }
-}
+            }

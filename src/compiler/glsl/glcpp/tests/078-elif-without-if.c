@@ -1,1 +1,1 @@
-#elif defined FOO
+   #elif defined FOO

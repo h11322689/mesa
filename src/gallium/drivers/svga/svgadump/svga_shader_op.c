@@ -1,47 +1,42 @@
-/**********************************************************
- * Copyright 2008-2009 VMware, Inc.  All rights reserved.
- *
- * Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use, copy,
- * modify, merge, publish, distribute, sublicense, and/or sell copies
- * of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
- * BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
- * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- *
- **********************************************************/
-
-/**
- * @file
- * SVGA Shader Token Opcode Info
- * 
- * @author Michal Krol <michal@vmware.com>
- */
-
-#include "util/u_debug.h"
-#include "svga_shader_op.h"
-
-#include "../svga_hw_reg.h"
-#include "svga3d_shaderdefs.h"
-
-#define SVGA3DOP_INVALID SVGA3DOP_END
-#define TGSI_OPCODE_INVALID TGSI_OPCODE_LAST
-
-static struct sh_opcode_info opcode_info[] =
-{
-   { "nop",          0, 0, 0, 0, SVGA3DOP_NOP          },
+   /**********************************************************
+   * Copyright 2008-2009 VMware, Inc.  All rights reserved.
+   *
+   * Permission is hereby granted, free of charge, to any person
+   * obtaining a copy of this software and associated documentation
+   * files (the "Software"), to deal in the Software without
+   * restriction, including without limitation the rights to use, copy,
+   * modify, merge, publish, distribute, sublicense, and/or sell copies
+   * of the Software, and to permit persons to whom the Software is
+   * furnished to do so, subject to the following conditions:
+   *
+   * The above copyright notice and this permission notice shall be
+   * included in all copies or substantial portions of the Software.
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+   * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+   * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+   * BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+   * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+   * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   * SOFTWARE.
+   *
+   **********************************************************/
+      /**
+   * @file
+   * SVGA Shader Token Opcode Info
+   * 
+   * @author Michal Krol <michal@vmware.com>
+   */
+      #include "util/u_debug.h"
+   #include "svga_shader_op.h"
+      #include "../svga_hw_reg.h"
+   #include "svga3d_shaderdefs.h"
+      #define SVGA3DOP_INVALID SVGA3DOP_END
+   #define TGSI_OPCODE_INVALID TGSI_OPCODE_LAST
+      static struct sh_opcode_info opcode_info[] =
+   {
+      { "nop",          0, 0, 0, 0, SVGA3DOP_NOP          },
    { "mov",          1, 1, 0, 0, SVGA3DOP_MOV,         },
    { "add",          1, 2, 0, 0, SVGA3DOP_ADD,         },
    { "sub",          1, 2, 0, 0, SVGA3DOP_SUB,         },
@@ -137,34 +132,18 @@ static struct sh_opcode_info opcode_info[] =
    { "texldd",       1, 4, 0, 0, SVGA3DOP_INVALID,     },
    { "setp",         1, 2, 0, 0, SVGA3DOP_SETP,        },
    { "texldl",       1, 2, 0, 0, SVGA3DOP_TEXLDL,      },
-   { "breakp",       0, 1, 0, 0, SVGA3DOP_INVALID,     },
-};
-
-const struct sh_opcode_info *svga_opcode_info( uint op )
-{
-   struct sh_opcode_info *info;
-
-   if (op >= ARRAY_SIZE(opcode_info)) {
+      };
+      const struct sh_opcode_info *svga_opcode_info( uint op )
+   {
+               if (op >= ARRAY_SIZE(opcode_info)) {
       /* The opcode is either PHASE, COMMENT, END or out of range.
-       */
-      assert( 0 );
-      return NULL;
-   }
-
-   info = &opcode_info[op];
-
-   if (info->svga_opcode == SVGA3DOP_INVALID) {
+   */
+   assert( 0 );
+                        if (info->svga_opcode == SVGA3DOP_INVALID) {
       /* No valid information. Please provide number of dst/src registers.
-       */
-      _debug_printf("Missing information for opcode %u, '%s'\n", op,
-                    opcode_info[op].mnemonic);
-      assert( 0 );
-      return NULL;
-   }
-
-   /* Sanity check.
-    */
-   assert( op == info->svga_opcode );
-
-   return info;
-}
+   */
+   _debug_printf("Missing information for opcode %u, '%s'\n", op,
+         assert( 0 );
+               /* Sanity check.
+   */
+               }

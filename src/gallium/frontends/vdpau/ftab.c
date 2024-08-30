@@ -1,39 +1,35 @@
-/**************************************************************************
- *
- * Copyright 2010 Younes Manton & Thomas Balling Sørensen.
- * All Rights Reserved.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- * The above copyright notice and this permission notice (including the
- * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT.
- * IN NO EVENT SHALL VMWARE AND/OR ITS SUPPLIERS BE LIABLE FOR
- * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
- * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
- * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- **************************************************************************/
-
-#include <assert.h>
-
-#include "util/u_memory.h"
-
-#include "vdpau_private.h"
-
-static void* ftab[67] =
-{
-   &vlVdpGetErrorString, /* VDP_FUNC_ID_GET_ERROR_STRING */
+   /**************************************************************************
+   *
+   * Copyright 2010 Younes Manton & Thomas Balling Sørensen.
+   * All Rights Reserved.
+   *
+   * Permission is hereby granted, free of charge, to any person obtaining a
+   * copy of this software and associated documentation files (the
+   * "Software"), to deal in the Software without restriction, including
+   * without limitation the rights to use, copy, modify, merge, publish,
+   * distribute, sub license, and/or sell copies of the Software, and to
+   * permit persons to whom the Software is furnished to do so, subject to
+   * the following conditions:
+   *
+   * The above copyright notice and this permission notice (including the
+   * next paragraph) shall be included in all copies or substantial portions
+   * of the Software.
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+   * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT.
+   * IN NO EVENT SHALL VMWARE AND/OR ITS SUPPLIERS BE LIABLE FOR
+   * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+   * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+   * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+   *
+   **************************************************************************/
+      #include <assert.h>
+      #include "util/u_memory.h"
+      #include "vdpau_private.h"
+      static void* ftab[67] =
+   {
+      &vlVdpGetErrorString, /* VDP_FUNC_ID_GET_ERROR_STRING */
    &vlVdpGetProcAddress, /* VDP_FUNC_ID_GET_PROC_ADDRESS */
    &vlVdpGetApiVersion, /* VDP_FUNC_ID_GET_API_VERSION */
    NULL, /* DUMMY */
@@ -99,41 +95,25 @@ static void* ftab[67] =
    &vlVdpPresentationQueueDisplay, /* VDP_FUNC_ID_PRESENTATION_QUEUE_DISPLAY */
    &vlVdpPresentationQueueBlockUntilSurfaceIdle, /* VDP_FUNC_ID_PRESENTATION_QUEUE_BLOCK_UNTIL_SURFACE_IDLE */
    &vlVdpPresentationQueueQuerySurfaceStatus, /* VDP_FUNC_ID_PRESENTATION_QUEUE_QUERY_SURFACE_STATUS */
-   &vlVdpPreemptionCallbackRegister  /* VDP_FUNC_ID_PREEMPTION_CALLBACK_REGISTER */
-};
-
-static void* ftab_winsys[1] =
-{
-   &vlVdpPresentationQueueTargetCreateX11  /* VDP_FUNC_ID_PRESENTATION_QUEUE_TARGET_CREATE_X11 */
-};
-
-static void* ftab_driver[4] =
-{
-   &vlVdpVideoSurfaceGallium, /* VDP_FUNC_ID_SURFACE_GALLIUM */
+      };
+      static void* ftab_winsys[1] =
+   {
+         };
+      static void* ftab_driver[4] =
+   {
+      &vlVdpVideoSurfaceGallium, /* VDP_FUNC_ID_SURFACE_GALLIUM */
    &vlVdpOutputSurfaceGallium, /* VDP_FUNC_ID_OUTPUT_SURFACE_GALLIUM */
    &vlVdpVideoSurfaceDMABuf, /* VDP_FUNC_ID_VIDEO_SURFACE_DMA_BUF */
-   &vlVdpOutputSurfaceDMABuf /* VDP_FUNC_ID_OUTPUT_SURFACE_DMA_BUF */
-};
-
-bool vlGetFuncFTAB(VdpFuncId function_id, void **func)
-{
-   assert(func);
-   *func = NULL;
-
-   if (function_id < VDP_FUNC_ID_BASE_WINSYS) {
+      };
+      bool vlGetFuncFTAB(VdpFuncId function_id, void **func)
+   {
+      assert(func);
+            if (function_id < VDP_FUNC_ID_BASE_WINSYS) {
       if (function_id < ARRAY_SIZE(ftab))
-         *func = ftab[function_id];
-
-   } else if (function_id < VDP_FUNC_ID_BASE_DRIVER) {
+         } else if (function_id < VDP_FUNC_ID_BASE_DRIVER) {
       function_id -= VDP_FUNC_ID_BASE_WINSYS;
-      if (function_id < ARRAY_SIZE(ftab_winsys))
-         *func = ftab_winsys[function_id];
-
-   } else {
+   if (function_id < ARRAY_SIZE(ftab_winsys))
+         } else {
       function_id -= VDP_FUNC_ID_BASE_DRIVER;
-      if (function_id < ARRAY_SIZE(ftab_driver))
-         *func = ftab_driver[function_id];
-   }
-
-   return *func != NULL;
-}
+   if (function_id < ARRAY_SIZE(ftab_driver))
+                  }

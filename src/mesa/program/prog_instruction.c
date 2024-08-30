@@ -1,82 +1,63 @@
-/*
- * Mesa 3-D graphics library
- *
- * Copyright (C) 1999-2008  Brian Paul   All Rights Reserved.
- * Copyright (C) 1999-2009  VMware, Inc.  All Rights Reserved.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
- * OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
- * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
- * OTHER DEALINGS IN THE SOFTWARE.
- */
-
-
-#include <stdio.h>
-#include <assert.h>
-
-#include "util/glheader.h"
-#include "prog_instruction.h"
-#include "prog_parameter.h"
-
-
-/**
- * Initialize program instruction fields to defaults.
- * \param inst  first instruction to initialize
- * \param count  number of instructions to initialize
- */
-void
-_mesa_init_instructions(struct prog_instruction *inst, GLuint count)
-{
-   GLuint i;
-
-   memset(inst, 0, count * sizeof(struct prog_instruction));
-
-   for (i = 0; i < count; i++) {
+   /*
+   * Mesa 3-D graphics library
+   *
+   * Copyright (C) 1999-2008  Brian Paul   All Rights Reserved.
+   * Copyright (C) 1999-2009  VMware, Inc.  All Rights Reserved.
+   *
+   * Permission is hereby granted, free of charge, to any person obtaining a
+   * copy of this software and associated documentation files (the "Software"),
+   * to deal in the Software without restriction, including without limitation
+   * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+   * and/or sell copies of the Software, and to permit persons to whom the
+   * Software is furnished to do so, subject to the following conditions:
+   *
+   * The above copyright notice and this permission notice shall be included
+   * in all copies or substantial portions of the Software.
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+   * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+   * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+   * OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+   * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+   * OTHER DEALINGS IN THE SOFTWARE.
+   */
+         #include <stdio.h>
+   #include <assert.h>
+      #include "util/glheader.h"
+   #include "prog_instruction.h"
+   #include "prog_parameter.h"
+         /**
+   * Initialize program instruction fields to defaults.
+   * \param inst  first instruction to initialize
+   * \param count  number of instructions to initialize
+   */
+   void
+   _mesa_init_instructions(struct prog_instruction *inst, GLuint count)
+   {
+                        for (i = 0; i < count; i++) {
       inst[i].SrcReg[0].File = PROGRAM_UNDEFINED;
-      inst[i].SrcReg[0].Swizzle = SWIZZLE_NOOP;
-      inst[i].SrcReg[1].File = PROGRAM_UNDEFINED;
-      inst[i].SrcReg[1].Swizzle = SWIZZLE_NOOP;
-      inst[i].SrcReg[2].File = PROGRAM_UNDEFINED;
-      inst[i].SrcReg[2].Swizzle = SWIZZLE_NOOP;
-
-      inst[i].DstReg.File = PROGRAM_UNDEFINED;
-      inst[i].DstReg.WriteMask = WRITEMASK_XYZW;
-
-      inst[i].Saturate = GL_FALSE;
-   }
-}
-
-
-/**
- * Basic info about each instruction
- */
-struct instruction_info
-{
-   enum prog_opcode Opcode;
+   inst[i].SrcReg[0].Swizzle = SWIZZLE_NOOP;
+   inst[i].SrcReg[1].File = PROGRAM_UNDEFINED;
+   inst[i].SrcReg[1].Swizzle = SWIZZLE_NOOP;
+   inst[i].SrcReg[2].File = PROGRAM_UNDEFINED;
+            inst[i].DstReg.File = PROGRAM_UNDEFINED;
+                  }
+         /**
+   * Basic info about each instruction
+   */
+   struct instruction_info
+   {
+      enum prog_opcode Opcode;
    const char *Name;
    GLuint NumSrcRegs;
-   GLuint NumDstRegs;
-};
-
-/**
- * Instruction info
- * \note Opcode should equal array index!
- */
-static const struct instruction_info InstInfo[MAX_OPCODE] = {
-   { OPCODE_NOP,    "NOP",     0, 0 },
+      };
+      /**
+   * Instruction info
+   * \note Opcode should equal array index!
+   */
+   static const struct instruction_info InstInfo[MAX_OPCODE] = {
+      { OPCODE_NOP,    "NOP",     0, 0 },
    { OPCODE_ABS,    "ABS",     1, 1 },
    { OPCODE_ADD,    "ADD",     2, 1 },
    { OPCODE_ARL,    "ARL",     1, 1 },
@@ -119,48 +100,36 @@ static const struct instruction_info InstInfo[MAX_OPCODE] = {
    { OPCODE_TXD,    "TXD",     3, 1 },
    { OPCODE_TXL,    "TXL",     1, 1 },
    { OPCODE_TXP,    "TXP",     1, 1 },
-   { OPCODE_XPD,    "XPD",     2, 1 }
-};
-
-
-/**
- * Return the number of src registers for the given instruction/opcode.
- */
-GLuint
-_mesa_num_inst_src_regs(enum prog_opcode opcode)
-{
-   assert(opcode < MAX_OPCODE);
+      };
+         /**
+   * Return the number of src registers for the given instruction/opcode.
+   */
+   GLuint
+   _mesa_num_inst_src_regs(enum prog_opcode opcode)
+   {
+      assert(opcode < MAX_OPCODE);
    assert(opcode == InstInfo[opcode].Opcode);
    assert(OPCODE_XPD == InstInfo[OPCODE_XPD].Opcode);
-   return InstInfo[opcode].NumSrcRegs;
-}
-
-
-/**
- * Return the number of dst registers for the given instruction/opcode.
- */
-GLuint
-_mesa_num_inst_dst_regs(enum prog_opcode opcode)
-{
-   assert(opcode < MAX_OPCODE);
+      }
+         /**
+   * Return the number of dst registers for the given instruction/opcode.
+   */
+   GLuint
+   _mesa_num_inst_dst_regs(enum prog_opcode opcode)
+   {
+      assert(opcode < MAX_OPCODE);
    assert(opcode == InstInfo[opcode].Opcode);
    assert(OPCODE_XPD == InstInfo[OPCODE_XPD].Opcode);
-   return InstInfo[opcode].NumDstRegs;
-}
-
-
-/**
- * Return string name for given program opcode.
- */
-const char *
-_mesa_opcode_string(enum prog_opcode opcode)
-{
-   if (opcode < MAX_OPCODE)
-      return InstInfo[opcode].Name;
-   else {
+      }
+         /**
+   * Return string name for given program opcode.
+   */
+   const char *
+   _mesa_opcode_string(enum prog_opcode opcode)
+   {
+      if (opcode < MAX_OPCODE)
+         else {
       static char s[20];
-      snprintf(s, sizeof(s), "OP%u", opcode);
-      return s;
-   }
-}
-
+   snprintf(s, sizeof(s), "OP%u", opcode);
+         }
+   

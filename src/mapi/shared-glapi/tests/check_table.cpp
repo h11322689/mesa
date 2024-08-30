@@ -1,62 +1,51 @@
-/*
- * Copyright © 2012 Intel Corporation
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice (including the next
- * paragraph) shall be included in all copies or substantial portions of the
- * Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- */
-
-#include <gtest/gtest.h>
-
-#include "glapi/glapi.h"
-#include "glapitable.h"
-
-struct name_offset {
-   const char *name;
-   int offset;
-};
-
-extern const struct name_offset linux_gl_abi[];
-
-TEST(GetProcAddress, ABIOffsetByName)
-{
-   /* 408 functions have had their locations in the dispatch table set since
-    * the dawn of time.  Verify that all of these functions are at the correct
-    * locations.
-    */
+   /*
+   * Copyright © 2012 Intel Corporation
+   *
+   * Permission is hereby granted, free of charge, to any person obtaining a
+   * copy of this software and associated documentation files (the "Software"),
+   * to deal in the Software without restriction, including without limitation
+   * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+   * and/or sell copies of the Software, and to permit persons to whom the
+   * Software is furnished to do so, subject to the following conditions:
+   *
+   * The above copyright notice and this permission notice (including the next
+   * paragraph) shall be included in all copies or substantial portions of the
+   * Software.
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+   * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+   * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+   * DEALINGS IN THE SOFTWARE.
+   */
+      #include <gtest/gtest.h>
+      #include "glapi/glapi.h"
+   #include "glapitable.h"
+      struct name_offset {
+      const char *name;
+      };
+      extern const struct name_offset linux_gl_abi[];
+      TEST(GetProcAddress, ABIOffsetByName)
+   {
+      /* 408 functions have had their locations in the dispatch table set since
+   * the dawn of time.  Verify that all of these functions are at the correct
+   * locations.
+   */
    for (unsigned i = 0; linux_gl_abi[i].name != NULL; i++) {
-      EXPECT_EQ(linux_gl_abi[i].offset,
-		_glapi_get_proc_offset(linux_gl_abi[i].name))
-	 << "function name: " << linux_gl_abi[i].name;
-   }
-}
-
-TEST(GetProcAddress, TableBigEnoughForABI)
-{
-   /* FINISHME: This should check that the dispatch table is large enough to
-    * FINISHME: hold all of the unique functions for OpenGL 1.2, OpenGL ES
-    * FINISHME: 1.1, and OpenGL ES 2.0.
-    */
-   EXPECT_LT(408u, _glapi_get_dispatch_table_size());
-}
-
-const struct name_offset linux_gl_abi[] = {
-   { "glNewList", 0 },
+      _glapi_get_proc_offset(linux_gl_abi[i].name))
+   << "function name: " << linux_gl_abi[i].name;
+         }
+      TEST(GetProcAddress, TableBigEnoughForABI)
+   {
+      /* FINISHME: This should check that the dispatch table is large enough to
+   * FINISHME: hold all of the unique functions for OpenGL 1.2, OpenGL ES
+   * FINISHME: 1.1, and OpenGL ES 2.0.
+   */
+      }
+      const struct name_offset linux_gl_abi[] = {
+      { "glNewList", 0 },
    { "glEndList", 1 },
    { "glCallList", 2 },
    { "glCallLists", 3 },
@@ -464,5 +453,4 @@ const struct name_offset linux_gl_abi[] = {
    { "glMultiTexCoord4ivARB", 405 },
    { "glMultiTexCoord4sARB", 406 },
    { "glMultiTexCoord4svARB", 407 },
-   { NULL, 0 }
-};
+      };

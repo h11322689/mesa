@@ -1,2 +1,2 @@
-#version 130
-#define FOO
+   #version 130
+   #define FOO

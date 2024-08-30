@@ -1,44 +1,37 @@
-/*
- * Copyright © Microsoft Corporation
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice (including the next
- * paragraph) shall be included in all copies or substantial portions of the
- * Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- */
-
-#include "u_driconf.h"
-
-void
-u_driconf_fill_st_options(struct st_config_options *options,
-                          const struct driOptionCache *optionCache)
-{
-#define query_option_impl(option, type) \
-   options->option = driQueryOption##type(optionCache, #option)
-#define query_bool_option(option) query_option_impl(option, b)
-#define query_int_option(option) query_option_impl(option, i)
-#define query_string_option(option) \
-   do { \
+   /*
+   * Copyright © Microsoft Corporation
+   *
+   * Permission is hereby granted, free of charge, to any person obtaining a
+   * copy of this software and associated documentation files (the "Software"),
+   * to deal in the Software without restriction, including without limitation
+   * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+   * and/or sell copies of the Software, and to permit persons to whom the
+   * Software is furnished to do so, subject to the following conditions:
+   *
+   * The above copyright notice and this permission notice (including the next
+   * paragraph) shall be included in all copies or substantial portions of the
+   * Software.
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+   * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+   * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+   * IN THE SOFTWARE.
+   */
+      #include "u_driconf.h"
+      void
+   u_driconf_fill_st_options(struct st_config_options *options,
+         {
+   #define query_option_impl(option, type) \
+         #define query_bool_option(option) query_option_impl(option, b)
+   #define query_int_option(option) query_option_impl(option, i)
+   #define query_string_option(option) \
+      do { \
       char *option = driQueryOptionstr(optionCache, #option); \
-      if (*option) \
-         options->option = strdup(option); \
-   } while (0)
-
-   query_bool_option(disable_blend_func_extended);
+   if (*option) \
+               query_bool_option(disable_blend_func_extended);
    query_bool_option(disable_arb_gpu_shader5);
    query_bool_option(disable_glsl_line_continuations);
    query_bool_option(disable_uniform_array_resize);
@@ -74,7 +67,4 @@ u_driconf_fill_st_options(struct st_config_options *options,
    query_string_option(force_gl_vendor);
    query_string_option(force_gl_renderer);
    query_string_option(mesa_extension_override);
-   query_bool_option(allow_multisampled_copyteximage);
-
-   driComputeOptionsSha1(optionCache, options->config_options_sha1);
-}
+               }

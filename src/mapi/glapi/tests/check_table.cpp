@@ -1,152 +1,120 @@
-/*
- * Copyright © 2012 Intel Corporation
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice (including the next
- * paragraph) shall be included in all copies or substantial portions of the
- * Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- */
-
-#include <gtest/gtest.h>
-
-#include "glapi/glapi.h"
-#include "glapitable.h"
-
-struct name_offset {
-   const char *name;
-   size_t offset;
-};
-
-extern const struct name_offset linux_gl_abi[];
-extern const struct name_offset known_dispatch[];
-
-TEST(GetProcAddress, ABIOffsetByName)
-{
-   /* 408 functions have had their locations in the dispatch table set since
-    * the dawn of time.  Verify that all of these functions are at the correct
-    * locations.
-    */
+   /*
+   * Copyright © 2012 Intel Corporation
+   *
+   * Permission is hereby granted, free of charge, to any person obtaining a
+   * copy of this software and associated documentation files (the "Software"),
+   * to deal in the Software without restriction, including without limitation
+   * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+   * and/or sell copies of the Software, and to permit persons to whom the
+   * Software is furnished to do so, subject to the following conditions:
+   *
+   * The above copyright notice and this permission notice (including the next
+   * paragraph) shall be included in all copies or substantial portions of the
+   * Software.
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+   * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+   * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+   * DEALINGS IN THE SOFTWARE.
+   */
+      #include <gtest/gtest.h>
+      #include "glapi/glapi.h"
+   #include "glapitable.h"
+      struct name_offset {
+      const char *name;
+      };
+      extern const struct name_offset linux_gl_abi[];
+   extern const struct name_offset known_dispatch[];
+      TEST(GetProcAddress, ABIOffsetByName)
+   {
+      /* 408 functions have had their locations in the dispatch table set since
+   * the dawn of time.  Verify that all of these functions are at the correct
+   * locations.
+   */
    for (unsigned i = 0; linux_gl_abi[i].name != NULL; i++) {
-      EXPECT_EQ(linux_gl_abi[i].offset,
-		_glapi_get_proc_offset(linux_gl_abi[i].name))
-	 << "function name: " << linux_gl_abi[i].name;
-   }
-}
-
-TEST(GetProcAddress, ABINameByOffset)
-{
-   /* 408 functions have had their locations in the dispatch table set since
-    * the dawn of time.  Verify that all of these functions are at the correct
-    * locations.
-    */
+      _glapi_get_proc_offset(linux_gl_abi[i].name))
+   << "function name: " << linux_gl_abi[i].name;
+         }
+      TEST(GetProcAddress, ABINameByOffset)
+   {
+      /* 408 functions have had their locations in the dispatch table set since
+   * the dawn of time.  Verify that all of these functions are at the correct
+   * locations.
+   */
    for (unsigned i = 0; linux_gl_abi[i].name != NULL; i++) {
-      EXPECT_STREQ(linux_gl_abi[i].name,
-		   _glapi_get_proc_name(linux_gl_abi[i].offset))
-	 << "function offset: " << linux_gl_abi[i].offset;
-   }
-}
-
-TEST(GetProcAddress, TableBigEnoughForABI)
-{
-   const unsigned table_entries = sizeof(struct _glapi_table) / sizeof(void *);
-
-   EXPECT_GE(table_entries, 408u);
-}
-
-TEST(GetProcAddress, TableDidntShrink)
-{
-   const unsigned table_entries = sizeof(struct _glapi_table) / sizeof(void *);
-
-   /* The dispatch table is not expected to shrink.  At GIT commit b45052b the
-    * table had 978 entries.  Changes that intentionally reduce the size of
-    * the table are very rare.  In those cases, the expected value should be
-    * updated to reflect the change.
-    *
-    * Changes that accidentally reduce the size of the table are bugs, and
-    * they should be fixed.
-    *
-    * 6 entries were removed when GL_SGIS_pixel_texture was removed from the
-    * dispatch table.
-    *
-    * 1 entry was removed when GL_SGIX_pixel_texture was removed from the
-    * dispatch table.
-    *
-    * 2 entries were removed when GL_APPLE_texture_range was removed from the
-    * dispatch table.
-    *
-    * 13 entries were removed when GL_NV_register_combiners was removed from
-    * the dispatch table.
-    *
-    * 7 entries were removed when GL_NV_fence was removed from the dispatch
-    * table.
-    *
-    * 2 entries were removed when GL_NV_vertex_array_range was removed from
-    * the dispatch table.
-    */
-   EXPECT_GE(table_entries, 978u - 6u - 1u - 2u - 13u - 7u - 2u);
-}
-
-TEST(GetProcAddress, QueriedDispatchSizeBigEnough)
-{
-   const unsigned table_entries = sizeof(struct _glapi_table) / sizeof(void *);
-
-   /* _glapi_get_dispatch_table_size returns the size of the extended dispatch
-    * table.  This is the size of the static table with some extra entries for
-    * drivers to use for extensions that the core does not know about.
-    */
-   EXPECT_EQ(table_entries, _glapi_get_dispatch_table_size());
-}
-
-TEST(GetProcAddress, KnownDispatchOffsetsAreConsistent)
-{
-   /* Verify that the queried dispatch offset for every known function is
-    * consistent with its location in the static dispatch table.
-    *
-    * There is some redundancy between this test and ABIOffsetByName.  That's
-    * okay.  The offsets in ABIOffsetByName comdirectly from the ABI
-    * definition.  The offsets in this test come from locations in a structure
-    * definition generated by scripts.
-    */
+            << "function offset: " << linux_gl_abi[i].offset;
+         }
+      TEST(GetProcAddress, TableBigEnoughForABI)
+   {
+                  }
+      TEST(GetProcAddress, TableDidntShrink)
+   {
+               /* The dispatch table is not expected to shrink.  At GIT commit b45052b the
+   * table had 978 entries.  Changes that intentionally reduce the size of
+   * the table are very rare.  In those cases, the expected value should be
+   * updated to reflect the change.
+   *
+   * Changes that accidentally reduce the size of the table are bugs, and
+   * they should be fixed.
+   *
+   * 6 entries were removed when GL_SGIS_pixel_texture was removed from the
+   * dispatch table.
+   *
+   * 1 entry was removed when GL_SGIX_pixel_texture was removed from the
+   * dispatch table.
+   *
+   * 2 entries were removed when GL_APPLE_texture_range was removed from the
+   * dispatch table.
+   *
+   * 13 entries were removed when GL_NV_register_combiners was removed from
+   * the dispatch table.
+   *
+   * 7 entries were removed when GL_NV_fence was removed from the dispatch
+   * table.
+   *
+   * 2 entries were removed when GL_NV_vertex_array_range was removed from
+   * the dispatch table.
+   */
+      }
+      TEST(GetProcAddress, QueriedDispatchSizeBigEnough)
+   {
+               /* _glapi_get_dispatch_table_size returns the size of the extended dispatch
+   * table.  This is the size of the static table with some extra entries for
+   * drivers to use for extensions that the core does not know about.
+   */
+      }
+      TEST(GetProcAddress, KnownDispatchOffsetsAreConsistent)
+   {
+      /* Verify that the queried dispatch offset for every known function is
+   * consistent with its location in the static dispatch table.
+   *
+   * There is some redundancy between this test and ABIOffsetByName.  That's
+   * okay.  The offsets in ABIOffsetByName comdirectly from the ABI
+   * definition.  The offsets in this test come from locations in a structure
+   * definition generated by scripts.
+   */
    for (unsigned i = 0; known_dispatch[i].name != NULL; i++) {
-      EXPECT_EQ(known_dispatch[i].offset,
-		_glapi_get_proc_offset(known_dispatch[i].name))
-	 << "function name: " << known_dispatch[i].name;
-   }
-}
-
-TEST(GetProcAddress, KnownDispatchNamesAreConsistent)
-{
-   /* Verify that the queried dispatch name for every known function is
-    * consistent with its location in the static dispatch table.
-    *
-    * There is some redundancy between this test and ABINameByOffset.  That's
-    * okay.  The offsets in ABIOffsetByName comdirectly from the ABI
-    * definition.  The offsets in this test come from locations in a structure
-    * definition generated by scripts.
-    */
+      _glapi_get_proc_offset(known_dispatch[i].name))
+   << "function name: " << known_dispatch[i].name;
+         }
+      TEST(GetProcAddress, KnownDispatchNamesAreConsistent)
+   {
+      /* Verify that the queried dispatch name for every known function is
+   * consistent with its location in the static dispatch table.
+   *
+   * There is some redundancy between this test and ABINameByOffset.  That's
+   * okay.  The offsets in ABIOffsetByName comdirectly from the ABI
+   * definition.  The offsets in this test come from locations in a structure
+   * definition generated by scripts.
+   */
    for (unsigned i = 0; known_dispatch[i].name != NULL; i++) {
-      EXPECT_STREQ(known_dispatch[i].name,
-		   _glapi_get_proc_name(known_dispatch[i].offset))
-	 << "function offset: " << known_dispatch[i].offset;
-   }
-}
-
-const struct name_offset linux_gl_abi[] = {
-   { "glNewList", 0 },
+            << "function offset: " << known_dispatch[i].offset;
+         }
+      const struct name_offset linux_gl_abi[] = {
+      { "glNewList", 0 },
    { "glEndList", 1 },
    { "glCallList", 2 },
    { "glCallLists", 3 },
@@ -554,13 +522,10 @@ const struct name_offset linux_gl_abi[] = {
    { "glMultiTexCoord4iv", 405 },
    { "glMultiTexCoord4s", 406 },
    { "glMultiTexCoord4sv", 407 },
-   { NULL, 0 }
-};
-
-#define _O(f) ((intptr_t) & (((struct _glapi_table *) 0)->f)) / sizeof(void *)
-
-const struct name_offset known_dispatch[] = {
-   { "glNewList", _O(NewList) },
+      };
+      #define _O(f) ((intptr_t) & (((struct _glapi_table *) 0)->f)) / sizeof(void *)
+      const struct name_offset known_dispatch[] = {
+      { "glNewList", _O(NewList) },
    { "glEndList", _O(EndList) },
    { "glCallList", _O(CallList) },
    { "glCallLists", _O(CallLists) },
@@ -1503,154 +1468,117 @@ const struct name_offset known_dispatch[] = {
    { "glGetQueryObjectui64v", _O(GetQueryObjectui64v) },
    { "glEGLImageTargetRenderbufferStorageOES", _O(EGLImageTargetRenderbufferStorageOES) },
    { "glEGLImageTargetTexture2DOES", _O(EGLImageTargetTexture2DOES) },
-   { NULL, 0 }
-};
-
-#ifdef GLX_INDIRECT_RENDERING
-extern "C" {
-GLAPI GLboolean GLAPIENTRY
-glAreTexturesResidentEXT(GLsizei n, const GLuint *textures,
-			 GLboolean *residences)
-{
-   (void) n;
+      };
+      #ifdef GLX_INDIRECT_RENDERING
+   extern "C" {
+   GLAPI GLboolean GLAPIENTRY
+   glAreTexturesResidentEXT(GLsizei n, const GLuint *textures,
+         {
+      (void) n;
    (void) textures;
    (void) residences;
-   return GL_FALSE;
-}
-
-GLAPI void GLAPIENTRY
-glDeleteTexturesEXT(GLsizei n, const GLuint *textures)
-{
-   (void) n;
-   (void) textures;
-}
-
-GLAPI void GLAPIENTRY
-glGenTexturesEXT(GLsizei n, GLuint *textures)
-{
-   (void) n;
-   (void) textures;
-}
-
-GLAPI GLboolean GLAPIENTRY
-glIsTextureEXT(GLuint texture)
-{
-   (void) texture;
-   return GL_FALSE;
-}
-
-GLAPI void GLAPIENTRY
-glGetColorTableEXT(GLenum target, GLenum format, GLenum type, GLvoid *table)
-{
-   (void) target;
+      }
+      GLAPI void GLAPIENTRY
+   glDeleteTexturesEXT(GLsizei n, const GLuint *textures)
+   {
+      (void) n;
+      }
+      GLAPI void GLAPIENTRY
+   glGenTexturesEXT(GLsizei n, GLuint *textures)
+   {
+      (void) n;
+      }
+      GLAPI GLboolean GLAPIENTRY
+   glIsTextureEXT(GLuint texture)
+   {
+      (void) texture;
+      }
+      GLAPI void GLAPIENTRY
+   glGetColorTableEXT(GLenum target, GLenum format, GLenum type, GLvoid *table)
+   {
+      (void) target;
    (void) format;
    (void) type;
-   (void) table;
-}
-
-GLAPI void GLAPIENTRY
-glGetColorTableParameterfvEXT(GLenum target, GLenum pname, GLfloat *params)
-{
-   (void) target;
+      }
+      GLAPI void GLAPIENTRY
+   glGetColorTableParameterfvEXT(GLenum target, GLenum pname, GLfloat *params)
+   {
+      (void) target;
    (void) pname;
-   (void) params;
-}
-
-GLAPI void GLAPIENTRY
-glGetColorTableParameterivEXT(GLenum target, GLenum pname, GLint *params)
-{
-   (void) target;
+      }
+      GLAPI void GLAPIENTRY
+   glGetColorTableParameterivEXT(GLenum target, GLenum pname, GLint *params)
+   {
+      (void) target;
    (void) pname;
-   (void) params;
-}
-
-void GLAPIENTRY
-gl_dispatch_stub_356(GLenum target, GLenum format, GLenum type, GLvoid * image)
-{
-   (void) target;
+      }
+      void GLAPIENTRY
+   gl_dispatch_stub_356(GLenum target, GLenum format, GLenum type, GLvoid * image)
+   {
+      (void) target;
    (void) format;
    (void) type;
-   (void) image;
-}
-
-void GLAPIENTRY
-gl_dispatch_stub_357(GLenum target, GLenum pname, GLfloat * params)
-{
-   (void) target;
+      }
+      void GLAPIENTRY
+   gl_dispatch_stub_357(GLenum target, GLenum pname, GLfloat * params)
+   {
+      (void) target;
    (void) pname;
-   (void) params;
-}
-
-void GLAPIENTRY
-gl_dispatch_stub_358(GLenum target, GLenum pname, GLint * params)
-{
-   (void) target;
+      }
+      void GLAPIENTRY
+   gl_dispatch_stub_358(GLenum target, GLenum pname, GLint * params)
+   {
+      (void) target;
    (void) pname;
-   (void) params;
-}
-
-void GLAPIENTRY
-gl_dispatch_stub_359(GLenum target, GLenum format, GLenum type, GLvoid * row, GLvoid * column, GLvoid * span)
-{
-   (void) target;
+      }
+      void GLAPIENTRY
+   gl_dispatch_stub_359(GLenum target, GLenum format, GLenum type, GLvoid * row, GLvoid * column, GLvoid * span)
+   {
+      (void) target;
    (void) format;
    (void) type;
    (void) row;
    (void) column;
-   (void) span;
-}
-
-void GLAPIENTRY
-gl_dispatch_stub_361(GLenum target, GLboolean reset, GLenum format, GLenum type, GLvoid * values)
-{
-   (void) target;
+      }
+      void GLAPIENTRY
+   gl_dispatch_stub_361(GLenum target, GLboolean reset, GLenum format, GLenum type, GLvoid * values)
+   {
+      (void) target;
    (void) reset;
    (void) format;
    (void) type;
-   (void) values;
-}
-
-void GLAPIENTRY
-gl_dispatch_stub_362(GLenum target, GLenum pname, GLfloat * params)
-{
-   (void) target;
+      }
+      void GLAPIENTRY
+   gl_dispatch_stub_362(GLenum target, GLenum pname, GLfloat * params)
+   {
+      (void) target;
    (void) pname;
-   (void) params;
-}
-
-void GLAPIENTRY
-gl_dispatch_stub_363(GLenum target, GLenum pname, GLint * params)
-{
-   (void) target;
+      }
+      void GLAPIENTRY
+   gl_dispatch_stub_363(GLenum target, GLenum pname, GLint * params)
+   {
+      (void) target;
    (void) pname;
-   (void) params;
-}
-
-void GLAPIENTRY
-gl_dispatch_stub_364(GLenum target, GLboolean reset, GLenum format, GLenum type, GLvoid * values)
-{
-   (void) target;
+      }
+      void GLAPIENTRY
+   gl_dispatch_stub_364(GLenum target, GLboolean reset, GLenum format, GLenum type, GLvoid * values)
+   {
+      (void) target;
    (void) reset;
    (void) format;
    (void) type;
-   (void) values;
-}
-
-void GLAPIENTRY
-gl_dispatch_stub_365(GLenum target, GLenum pname, GLfloat * params)
-{
-   (void) target;
+      }
+      void GLAPIENTRY
+   gl_dispatch_stub_365(GLenum target, GLenum pname, GLfloat * params)
+   {
+      (void) target;
    (void) pname;
-   (void) params;
-}
-
-void GLAPIENTRY
-gl_dispatch_stub_366(GLenum target, GLenum pname, GLint * params)
-{
-   (void) target;
+      }
+      void GLAPIENTRY
+   gl_dispatch_stub_366(GLenum target, GLenum pname, GLint * params)
+   {
+      (void) target;
    (void) pname;
-   (void) params;
-}
-
-}
-#endif
+      }
+      }
+   #endif

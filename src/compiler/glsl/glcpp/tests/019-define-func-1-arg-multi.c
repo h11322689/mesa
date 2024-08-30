@@ -1,2 +1,2 @@
-#define foo(x) (x)
-foo(this is more than one word)
+   #define foo(x) (x)
+   foo(this is more than one word)

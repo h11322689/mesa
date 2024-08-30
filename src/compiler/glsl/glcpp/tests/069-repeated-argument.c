@@ -1,2 +1,2 @@
-#define double(x) x x
-double(1)
+   #define double(x) x x
+   double(1)

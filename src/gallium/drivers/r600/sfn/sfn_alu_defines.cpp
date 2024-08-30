@@ -1,40 +1,36 @@
-/* -*- mesa-c++  -*-
- *
- * Copyright (c) 2018 Collabora LTD
- *
- * Author: Gert Wollny <gert.wollny@collabora.com>
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * on the rights to use, copy, modify, merge, publish, distribute, sub
- * license, and/or sell copies of the Software, and to permit persons to whom
- * the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice (including the next
- * paragraph) shall be included in all copies or substantial portions of the
- * Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL
- * THE AUTHOR(S) AND/OR THEIR SUPPLIERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
- * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
- * USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
-
-#include "sfn_alu_defines.h"
-
-namespace r600 {
-
-#define A AluOp::a
-#define V AluOp::v
-#define T AluOp::t
-#define X AluOp::x
-
-const std::map<EAluOp, AluOp> alu_ops = {
-   {op0_nop,                       AluOp(0, 0, 0, 0, A, A, A, "NOP")                      },
+   /* -*- mesa-c++  -*-
+   *
+   * Copyright (c) 2018 Collabora LTD
+   *
+   * Author: Gert Wollny <gert.wollny@collabora.com>
+   *
+   * Permission is hereby granted, free of charge, to any person obtaining a
+   * copy of this software and associated documentation files (the "Software"),
+   * to deal in the Software without restriction, including without limitation
+   * on the rights to use, copy, modify, merge, publish, distribute, sub
+   * license, and/or sell copies of the Software, and to permit persons to whom
+   * the Software is furnished to do so, subject to the following conditions:
+   *
+   * The above copyright notice and this permission notice (including the next
+   * paragraph) shall be included in all copies or substantial portions of the
+   * Software.
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL
+   * THE AUTHOR(S) AND/OR THEIR SUPPLIERS BE LIABLE FOR ANY CLAIM,
+   * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+   * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+   * USE OR OTHER DEALINGS IN THE SOFTWARE.
+   */
+      #include "sfn_alu_defines.h"
+      namespace r600 {
+      #define A AluOp::a
+   #define V AluOp::v
+   #define T AluOp::t
+   #define X AluOp::x
+      const std::map<EAluOp, AluOp> alu_ops = {
+      {op0_nop,                       AluOp(0, 0, 0, 0, A, A, A, "NOP")                      },
    {op0_group_barrier,             AluOp(0, 0, 0, 0, X, X, X, "GROUP_BARRIER")            },
    {op0_group_seq_begin,           AluOp(0, 0, 0, 0, A, A, A, "GROUP_SEQ_BEGIN")          },
    {op0_group_seq_end,             AluOp(0, 0, 0, 0, A, A, A, "GROUP_SEQ_END")            },
@@ -42,9 +38,7 @@ const std::map<EAluOp, AluOp> alu_ops = {
    {op0_store_flags,               AluOp(0, 0, 0, 0, V, V, V, "STORE_FLAGS")              },
    {op0_lds_1a,                    AluOp(0, 0, 0, 0, V, V, V, "LDS_1A")                   },
    {op0_lds_1a1d,                  AluOp(0, 0, 0, 0, V, V, V, "LDS_1A1D")                 },
-   {op0_lds_2a,                    AluOp(0, 0, 0, 0, V, V, V, "LDS_2A")                   },
-
-   {op1_bcnt_int,                  AluOp(1, 0, 0, 0, V, V, V, "BCNT_INT")                 },
+            {op1_bcnt_int,                  AluOp(1, 0, 0, 0, V, V, V, "BCNT_INT")                 },
    {op1_bcnt_accum_prev_int,       AluOp(1, 0, 0, 0, V, V, V, "BCNT_ACCUM_PREV_INT")      },
    {op1_bfrev_int,                 AluOp(1, 0, 0, 0, A, A, A, "BFREV_INT")                },
    {op1_ceil,                      AluOp(1, 1, 1, 0, A, A, A, "CEIL")                     },
@@ -108,9 +102,7 @@ const std::map<EAluOp, AluOp> alu_ops = {
    {op1_ffbh_int,                  AluOp(1, 0, 0, 0, V, V, V, "FFBH_INT")                 },
    {op1_flt_to_uint4,              AluOp(1, 1, 0, 0, V, V, V, "FLT_TO_UINT4")             },
    {op1v_flt32_to_flt64,           AluOp(1, 1, 0, 1, A, A, A, "FLT32_TO_FLT64")           },
-   {op1v_flt64_to_flt32,           AluOp(1, 1, 1, 1, V, V, V, "FLT64_TO_FLT32")           },
-
-   {op2_add,                       AluOp(2, 1, 1, 0, A, A, A, "ADD")                      },
+            {op2_add,                       AluOp(2, 1, 1, 0, A, A, A, "ADD")                      },
    {op2_bfm_int,                   AluOp(2, 0, 0, 0, V, V, V, "BFM_INT")                  },
    {op2_mul,                       AluOp(2, 1, 1, 0, A, A, A, "MUL")                      },
    {op2_mul_ieee,                  AluOp(2, 1, 1, 0, A, A, A, "MUL_IEEE")                 },
@@ -211,9 +203,7 @@ const std::map<EAluOp, AluOp> alu_ops = {
    {op2_interp_xy,                 AluOp(2, 0, 0, 0, V, V, V, "INTERP_XY")                },
    {op2_interp_zw,                 AluOp(2, 0, 0, 0, V, V, V, "INTERP_ZW")                },
    {op2_interp_x,                  AluOp(2, 0, 0, 0, V, V, V, "INTERP_X")                 },
-   {op2_interp_z,                  AluOp(2, 0, 0, 0, V, V, V, "INTERP_Z")                 },
-
-   {op3_bfe_uint,                  AluOp(3, 0, 0, 0, V, V, V, "BFE_UINT")                 },
+            {op3_bfe_uint,                  AluOp(3, 0, 0, 0, V, V, V, "BFE_UINT")                 },
    {op3_bfe_int,                   AluOp(3, 0, 0, 0, V, V, V, "BFE_INT")                  },
    {op3_bfi_int,                   AluOp(3, 0, 0, 0, V, V, V, "BFI_INT")                  },
    {op3_fma,                       AluOp(3, 1, 1, 0, V, V, V, "FMA")                      },
@@ -237,16 +227,13 @@ const std::map<EAluOp, AluOp> alu_ops = {
    {op3_cnde_int,                  AluOp(3, 0, 0, 0, A, A, A, "CNDE_INT")                 },
    {op3_cndgt_int,                 AluOp(3, 0, 0, 0, A, A, A, "CNDGT_INT")                },
    {op3_cndge_int,                 AluOp(3, 0, 0, 0,A, A, A, "CNDGE_INT")                },
-   {op3_mul_lit,                   AluOp(3, 1, 0, 0,T, T, T, "MUL_LIT")                  }
-};
-
-#undef A
-#undef V
-#undef T
-#undef X
-
-const std::map<AluInlineConstants, AluInlineConstantDescr> alu_src_const = {
-   {ALU_SRC_LDS_OQ_A,            {false, "LDS_OQ_A"}           },
+      };
+      #undef A
+   #undef V
+   #undef T
+   #undef X
+      const std::map<AluInlineConstants, AluInlineConstantDescr> alu_src_const = {
+      {ALU_SRC_LDS_OQ_A,            {false, "LDS_OQ_A"}           },
    {ALU_SRC_LDS_OQ_B,            {false, "LDS_OQ_B"}           },
    {ALU_SRC_LDS_OQ_A_POP,        {false, "LDS_OQ_A_POP"}       },
    {ALU_SRC_LDS_OQ_B_POP,        {false, "LDS_OQ_B_POP"}       },
@@ -279,11 +266,9 @@ const std::map<AluInlineConstants, AluInlineConstantDescr> alu_src_const = {
    {ALU_SRC_0_5,                 {false, "0.5"}                },
    {ALU_SRC_LITERAL,             {true, "ALU_SRC_LITERAL"}     },
    {ALU_SRC_PV,                  {true, "PV"}                  },
-   {ALU_SRC_PS,                  {false, "PS"}                 }
-};
-
-const std::map<ESDOp, LDSOp> lds_ops = {
-   {DS_OP_ADD,                      {2, "ADD"}                     },
+      };
+      const std::map<ESDOp, LDSOp> lds_ops = {
+      {DS_OP_ADD,                      {2, "ADD"}                     },
    {DS_OP_SUB,                      {2, "SUB"}                     },
    {DS_OP_RSUB,                     {2, "RSUB"}                    },
    {DS_OP_INC,                      {2, "INC"}                     },
@@ -349,7 +334,5 @@ const std::map<ESDOp, LDSOp> lds_ops = {
    {LDS_XOR,                        {2, "LDS_XOR"}                 },
    {LDS_XCHG_RET,                   {2, "LDS_XCHG_RET"}            },
    {LDS_CMP_XCHG_RET,               {3, "LDS_CMP_XCHG_RET"}        },
-   {LDS_WRITE_REL,                  {3, "LDS_WRITE_REL"}           },
-};
-
-} // namespace r600
+      };
+      } // namespace r600

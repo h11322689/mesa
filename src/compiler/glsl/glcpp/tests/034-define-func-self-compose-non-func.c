@@ -1,2 +1,2 @@
-#define foo(bar) bar
-foo(foo)
+   #define foo(bar) bar
+   foo(foo)

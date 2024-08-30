@@ -1,57 +1,48 @@
-/*
- * Copyright © 2022 Imagination Technologies Ltd.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice (including the next
- * paragraph) shall be included in all copies or substantial portions of the
- * Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
-#include <stddef.h>
-#include <stdint.h>
-#include <stdlib.h>
-
-#include "rogue.h"
-#include "util/macros.h"
-
-/**
- * \file rogue_constreg.c
- *
- * \brief Contains functions to find and allocate constant register values.
- */
-
-/**
- * \brief Mapping of constant register values and their indices.
- */
-typedef struct rogue_constreg_map {
-   uint32_t value;
-   unsigned index;
-} rogue_constreg_map;
-
-#define CONSTREG(VALUE, INDEX)            \
-   {                                      \
-      .value = (VALUE), .index = (INDEX), \
-   }
-
-/**
- * \brief Constant register values (sorted for bsearch).
- */
-static const rogue_constreg_map const_regs[] = {
-   CONSTREG(0x00000000U, 0U), /* 0   (INT32) / 0.0 (Float) */
+   /*
+   * Copyright © 2022 Imagination Technologies Ltd.
+   *
+   * Permission is hereby granted, free of charge, to any person obtaining a copy
+   * of this software and associated documentation files (the "Software"), to deal
+   * in the Software without restriction, including without limitation the rights
+   * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   * copies of the Software, and to permit persons to whom the Software is
+   * furnished to do so, subject to the following conditions:
+   *
+   * The above copyright notice and this permission notice (including the next
+   * paragraph) shall be included in all copies or substantial portions of the
+   * Software.
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   * SOFTWARE.
+   */
+      #include <stddef.h>
+   #include <stdint.h>
+   #include <stdlib.h>
+      #include "rogue.h"
+   #include "util/macros.h"
+      /**
+   * \file rogue_constreg.c
+   *
+   * \brief Contains functions to find and allocate constant register values.
+   */
+      /**
+   * \brief Mapping of constant register values and their indices.
+   */
+   typedef struct rogue_constreg_map {
+      uint32_t value;
+      } rogue_constreg_map;
+      #define CONSTREG(VALUE, INDEX)            \
+      {                                      \
+               /**
+   * \brief Constant register values (sorted for bsearch).
+   */
+   static const rogue_constreg_map const_regs[] = {
+      CONSTREG(0x00000000U, 0U), /* 0   (INT32) / 0.0 (Float) */
    CONSTREG(0x00000001U, 1U), /* 1   (INT32) */
    CONSTREG(0x00000002U, 2U), /* 2   (INT32) */
    CONSTREG(0x00000003U, 3U), /* 3   (INT32) */
@@ -83,9 +74,7 @@ static const rogue_constreg_map const_regs[] = {
    CONSTREG(0x0000001dU, 29U), /* 29  (INT32) */
    CONSTREG(0x0000001eU, 30U), /* 30  (INT32) */
    CONSTREG(0x0000001fU, 31U), /* 31  (INT32) */
-   CONSTREG(0x0000007fU, 147U), /* 127 (INT32) */
-
-   CONSTREG(0x37800000U, 134U), /* 1.0f/65536f */
+            CONSTREG(0x37800000U, 134U), /* 1.0f/65536f */
    CONSTREG(0x38000000U, 135U), /* 1.0f/32768f */
    CONSTREG(0x38800000U, 88U), /* float(2^-14) */
    CONSTREG(0x39000000U, 87U), /* float(2^-13) */
@@ -147,53 +136,34 @@ static const rogue_constreg_map const_regs[] = {
    CONSTREG(0x7f800000U, 142U), /* Infinity */
    CONSTREG(0x7fff7fffU, 144U), /* ARGB1555 mask */
    CONSTREG(0x80000000U, 141U), /* -0.0f */
-   CONSTREG(0xffffffffU, 143U), /* -1 */
-};
-
-#undef CONSTREG
-
-/**
- * \brief Comparison function for bsearch() to support rogue_constreg_map.
- *
- * \param[in] lhs The left hand side of the comparison.
- * \param[in] rhs The right hand side of the comparison.
- * \return 0 if (lhs == rhs), -1 if (lhs < rhs), 1 if (lhs > rhs).
- */
-static int constreg_cmp(const void *lhs, const void *rhs)
-{
-   const rogue_constreg_map *l = lhs;
-   const rogue_constreg_map *r = rhs;
-
-   if (l->value < r->value)
-      return -1;
-   else if (l->value > r->value)
-      return 1;
-
-   return 0;
-}
-
-/**
- * \brief Determines whether a given value exists in a constant register.
- *
- * \param[in] imm The immediate value required.
- * \return The index of the constant register containing the value, or
- * ROGUE_NO_CONST_REG if the value is not found.
- */
-PUBLIC
-unsigned rogue_constreg_lookup(rogue_imm_t imm)
-{
-   rogue_constreg_map constreg_target = {
-      .value = imm.u32,
-   };
-   const rogue_constreg_map *constreg;
-
-   constreg = bsearch(&constreg_target,
-                      const_regs,
-                      ARRAY_SIZE(const_regs),
-                      sizeof(rogue_constreg_map),
-                      constreg_cmp);
+      };
+      #undef CONSTREG
+      /**
+   * \brief Comparison function for bsearch() to support rogue_constreg_map.
+   *
+   * \param[in] lhs The left hand side of the comparison.
+   * \param[in] rhs The right hand side of the comparison.
+   * \return 0 if (lhs == rhs), -1 if (lhs < rhs), 1 if (lhs > rhs).
+   */
+   static int constreg_cmp(const void *lhs, const void *rhs)
+   {
+      const rogue_constreg_map *l = lhs;
+            if (l->value < r->value)
+         else if (l->value > r->value)
+               }
+      /**
+   * \brief Determines whether a given value exists in a constant register.
+   *
+   * \param[in] imm The immediate value required.
+   * \return The index of the constant register containing the value, or
+   * ROGUE_NO_CONST_REG if the value is not found.
+   */
+   PUBLIC
+   unsigned rogue_constreg_lookup(rogue_imm_t imm)
+   {
+      rogue_constreg_map constreg_target = {
+         };
+            constreg = bsearch(&constreg_target,
+                     const_regs,
    if (!constreg)
-      return ROGUE_NO_CONST_REG;
-
-   return constreg->index;
-}
+               }

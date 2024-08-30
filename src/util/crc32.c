@@ -1,47 +1,42 @@
-/**************************************************************************
- *
- * Copyright 2008 VMware, Inc.
- * All Rights Reserved.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- * The above copyright notice and this permission notice (including the
- * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT.
- * IN NO EVENT SHALL VMWARE AND/OR ITS SUPPLIERS BE LIABLE FOR
- * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
- * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
- * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- **************************************************************************/
-
-/**
- * @file
- * CRC32 implementation.
- *
- * @author Jose Fonseca
- */
-
-
-#ifdef HAVE_ZLIB
-#include <zlib.h>
-#endif
-#include "crc32.h"
-
-
-static const uint32_t
-util_crc32_table[256] = {
-   0x00000000, 0x77073096, 0xee0e612c, 0x990951ba,
+   /**************************************************************************
+   *
+   * Copyright 2008 VMware, Inc.
+   * All Rights Reserved.
+   *
+   * Permission is hereby granted, free of charge, to any person obtaining a
+   * copy of this software and associated documentation files (the
+   * "Software"), to deal in the Software without restriction, including
+   * without limitation the rights to use, copy, modify, merge, publish,
+   * distribute, sub license, and/or sell copies of the Software, and to
+   * permit persons to whom the Software is furnished to do so, subject to
+   * the following conditions:
+   *
+   * The above copyright notice and this permission notice (including the
+   * next paragraph) shall be included in all copies or substantial portions
+   * of the Software.
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+   * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT.
+   * IN NO EVENT SHALL VMWARE AND/OR ITS SUPPLIERS BE LIABLE FOR
+   * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+   * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+   * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+   *
+   **************************************************************************/
+      /**
+   * @file
+   * CRC32 implementation.
+   *
+   * @author Jose Fonseca
+   */
+         #ifdef HAVE_ZLIB
+   #include <zlib.h>
+   #endif
+   #include "crc32.h"
+         static const uint32_t
+   util_crc32_table[256] = {
+      0x00000000, 0x77073096, 0xee0e612c, 0x990951ba,
    0x076dc419, 0x706af48f, 0xe963a535, 0x9e6495a3,
    0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988,
    0x09b64c2b, 0x7eb17cbd, 0xe7b82d07, 0x90bf1d91,
@@ -104,31 +99,21 @@ util_crc32_table[256] = {
    0xbdbdf21c, 0xcabac28a, 0x53b39330, 0x24b4a3a6,
    0xbad03605, 0xcdd70693, 0x54de5729, 0x23d967bf,
    0xb3667a2e, 0xc4614ab8, 0x5d681b02, 0x2a6f2b94,
-   0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d
-};
-
-
-/**
- * @sa http://www.w3.org/TR/PNG/#D-CRCAppendix
- */
-uint32_t
-util_hash_crc32(const void *data, size_t size)
-{
-   const uint8_t *p = data;
-   uint32_t crc = 0xffffffff;
-
-#ifdef HAVE_ZLIB
-   /* Prefer zlib's implementation for better performance.
-    * zlib's uInt is always "unsigned int" while size_t can be 64bit.
-    * Since 1.2.9 there's crc32_z that takes size_t, but use the more
-    * available function to avoid build system complications.
-    */
+      };
+         /**
+   * @sa http://www.w3.org/TR/PNG/#D-CRCAppendix
+   */
+   uint32_t
+   util_hash_crc32(const void *data, size_t size)
+   {
+      const uint8_t *p = data;
+         #ifdef HAVE_ZLIB
+      /* Prefer zlib's implementation for better performance.
+   * zlib's uInt is always "unsigned int" while size_t can be 64bit.
+   * Since 1.2.9 there's crc32_z that takes size_t, but use the more
+   * available function to avoid build system complications.
+   */
    if ((uInt)size == size)
-      return ~crc32(0, data, size);
-#endif
-
-   while (size--)
-      crc = util_crc32_table[(crc ^ *p++) & 0xff] ^ (crc >> 8);
-
-   return crc;
-}
+      #endif
+         while (size--)
+               }

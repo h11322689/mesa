@@ -1,35 +1,33 @@
-/*
- * Copyright 2020 Red Hat Inc.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
- * THE COPYRIGHT HOLDER(S) OR AUTHOR(S) BE LIABLE FOR ANY CLAIM, DAMAGES OR
- * OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
- * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
- * OTHER DEALINGS IN THE SOFTWARE.
- */
-#include "qmd.h"
-#include "clc3c0qmd.h"
-
-#define NVC3C0_QMDV02_02_VAL(a...) NVQMD_VAL(NVC3C0, QMDV02_02, ##a)
-#define NVC3C0_QMDV02_02_DEF(a...) NVQMD_DEF(NVC3C0, QMDV02_02, ##a)
-#define NVC3C0_QMDV02_02_IDX(a...) NVQMD_IDX(NVC3C0, QMDV02_02, ##a)
-
-void
-NVC3C0QmdDump_V02_02(uint32_t *qmd)
-{
-   NVC3C0_QMDV02_02_VAL(qmd, OUTER_PUT, "0x%x");
+   /*
+   * Copyright 2020 Red Hat Inc.
+   *
+   * Permission is hereby granted, free of charge, to any person obtaining a
+   * copy of this software and associated documentation files (the "Software"),
+   * to deal in the Software without restriction, including without limitation
+   * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+   * and/or sell copies of the Software, and to permit persons to whom the
+   * Software is furnished to do so, subject to the following conditions:
+   *
+   * The above copyright notice and this permission notice shall be included in
+   * all copies or substantial portions of the Software.
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+   * THE COPYRIGHT HOLDER(S) OR AUTHOR(S) BE LIABLE FOR ANY CLAIM, DAMAGES OR
+   * OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+   * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+   * OTHER DEALINGS IN THE SOFTWARE.
+   */
+   #include "qmd.h"
+   #include "clc3c0qmd.h"
+      #define NVC3C0_QMDV02_02_VAL(a...) NVQMD_VAL(NVC3C0, QMDV02_02, ##a)
+   #define NVC3C0_QMDV02_02_DEF(a...) NVQMD_DEF(NVC3C0, QMDV02_02, ##a)
+   #define NVC3C0_QMDV02_02_IDX(a...) NVQMD_IDX(NVC3C0, QMDV02_02, ##a)
+      void
+   NVC3C0QmdDump_V02_02(uint32_t *qmd)
+   {
+      NVC3C0_QMDV02_02_VAL(qmd, OUTER_PUT, "0x%x");
    NVC3C0_QMDV02_02_VAL(qmd, OUTER_OVERFLOW, "0x%x");
    NVC3C0_QMDV02_02_VAL(qmd, OUTER_GET, "0x%x");
    NVC3C0_QMDV02_02_VAL(qmd, OUTER_STICKY_OVERFLOW, "0x%x");
@@ -92,8 +90,7 @@ NVC3C0QmdDump_V02_02(uint32_t *qmd)
    NVC3C0_QMDV02_02_VAL(qmd, CTA_THREAD_DIMENSION1, "0x%x");
    NVC3C0_QMDV02_02_VAL(qmd, CTA_THREAD_DIMENSION2, "0x%x");
    for (int i = 0; i < 8; i++)
-      NVC3C0_QMDV02_02_IDX(qmd, CONSTANT_BUFFER_VALID, i, FALSE, TRUE);
-   NVC3C0_QMDV02_02_VAL(qmd, REGISTER_COUNT_V, "0x%x");
+         NVC3C0_QMDV02_02_VAL(qmd, REGISTER_COUNT_V, "0x%x");
    NVC3C0_QMDV02_02_VAL(qmd, TARGET_SM_CONFIG_SHARED_MEM_SIZE, "0x%x");
    NVC3C0_QMDV02_02_VAL(qmd, FREE_CTA_SLOTS_EMPTY_SM, "0x%x");
    NVC3C0_QMDV02_02_VAL(qmd, SM_DISABLE_MASK_LOWER, "0x%x");
@@ -102,14 +99,7 @@ NVC3C0QmdDump_V02_02(uint32_t *qmd)
    NVC3C0_QMDV02_02_VAL(qmd, RELEASE0_ADDRESS_UPPER, "0x%x");
    NVC3C0_QMDV02_02_VAL(qmd, QMD_RESERVED_J, "0x%x");
    NVC3C0_QMDV02_02_DEF(qmd, RELEASE0_REDUCTION_OP, RED_ADD,
-                                                    RED_MIN,
-                                                    RED_MAX,
-                                                    RED_INC,
-                                                    RED_DEC,
-                                                    RED_AND,
-                                                    RED_OR,
-                                                    RED_XOR);
-   NVC3C0_QMDV02_02_VAL(qmd, QMD_RESERVED_K, "0x%x");
+                                             NVC3C0_QMDV02_02_VAL(qmd, QMD_RESERVED_K, "0x%x");
    NVC3C0_QMDV02_02_DEF(qmd, RELEASE0_REDUCTION_FORMAT, UNSIGNED_32, SIGNED_32);
    NVC3C0_QMDV02_02_DEF(qmd, RELEASE0_REDUCTION_ENABLE, FALSE, TRUE);
    NVC3C0_QMDV02_02_DEF(qmd, RELEASE0_STRUCTURE_SIZE, FOUR_WORDS, ONE_WORD);
@@ -118,14 +108,7 @@ NVC3C0QmdDump_V02_02(uint32_t *qmd)
    NVC3C0_QMDV02_02_VAL(qmd, RELEASE1_ADDRESS_UPPER, "0x%x");
    NVC3C0_QMDV02_02_VAL(qmd, QMD_RESERVED_L, "0x%x");
    NVC3C0_QMDV02_02_DEF(qmd, RELEASE1_REDUCTION_OP, RED_ADD,
-                                                    RED_MIN,
-                                                    RED_MAX,
-                                                    RED_INC,
-                                                    RED_DEC,
-                                                    RED_AND,
-                                                    RED_OR,
-                                                    RED_XOR);
-   NVC3C0_QMDV02_02_VAL(qmd, QMD_RESERVED_M, "0x%x");
+                                             NVC3C0_QMDV02_02_VAL(qmd, QMD_RESERVED_M, "0x%x");
    NVC3C0_QMDV02_02_DEF(qmd, RELEASE1_REDUCTION_FORMAT, UNSIGNED_32, SIGNED_32);
    NVC3C0_QMDV02_02_DEF(qmd, RELEASE1_REDUCTION_ENABLE, FALSE, TRUE);
    NVC3C0_QMDV02_02_DEF(qmd, RELEASE1_STRUCTURE_SIZE, FOUR_WORDS, ONE_WORD);
@@ -139,11 +122,10 @@ NVC3C0QmdDump_V02_02(uint32_t *qmd)
    NVC3C0_QMDV02_02_VAL(qmd, SASS_VERSION, "0x%x");
    for (int i = 0; i < 8; i++) {
       NVC3C0_QMDV02_02_VAL(qmd, CONSTANT_BUFFER_ADDR_LOWER, i, "0x%x");
-      NVC3C0_QMDV02_02_VAL(qmd, CONSTANT_BUFFER_ADDR_UPPER, i, "0x%x");
-      NVC3C0_QMDV02_02_VAL(qmd, CONSTANT_BUFFER_RESERVED_ADDR, i, "0x%x");
-      NVC3C0_QMDV02_02_IDX(qmd, CONSTANT_BUFFER_INVALIDATE, i, FALSE, TRUE);
-      NVC3C0_QMDV02_02_VAL(qmd, CONSTANT_BUFFER_SIZE_SHIFTED4, i, "0x%x");
-   }
+   NVC3C0_QMDV02_02_VAL(qmd, CONSTANT_BUFFER_ADDR_UPPER, i, "0x%x");
+   NVC3C0_QMDV02_02_VAL(qmd, CONSTANT_BUFFER_RESERVED_ADDR, i, "0x%x");
+   NVC3C0_QMDV02_02_IDX(qmd, CONSTANT_BUFFER_INVALIDATE, i, FALSE, TRUE);
+      }
    NVC3C0_QMDV02_02_VAL(qmd, PROGRAM_ADDRESS_LOWER, "0x%x");
    NVC3C0_QMDV02_02_VAL(qmd, PROGRAM_ADDRESS_UPPER, "0x%x");
    NVC3C0_QMDV02_02_VAL(qmd, QMD_RESERVED_S, "0x%x");
@@ -164,5 +146,4 @@ NVC3C0QmdDump_V02_02(uint32_t *qmd)
    NVC3C0_QMDV02_02_VAL(qmd, QMD_SPARE_M, "0x%x");
    NVC3C0_QMDV02_02_VAL(qmd, QMD_SPARE_N, "0x%x");
    NVC3C0_QMDV02_02_VAL(qmd, DEBUG_ID_UPPER, "0x%x");
-   NVC3C0_QMDV02_02_VAL(qmd, DEBUG_ID_LOWER, "0x%x");
-}
+      }

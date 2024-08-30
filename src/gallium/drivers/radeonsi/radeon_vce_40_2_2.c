@@ -1,62 +1,48 @@
-/**************************************************************************
- *
- * Copyright 2013 Advanced Micro Devices, Inc.
- *
- * SPDX-License-Identifier: MIT
- *
- **************************************************************************/
-
-#include "pipe/p_video_codec.h"
-#include "radeon_vce.h"
-#include "radeon_video.h"
-#include "si_pipe.h"
-#include "util/u_memory.h"
-#include "util/u_video.h"
-#include "vl/vl_video_buffer.h"
-
-#include <stdio.h>
-
-static void session(struct rvce_encoder *enc)
-{
-   RVCE_BEGIN(0x00000001); // session cmd
+   /**************************************************************************
+   *
+   * Copyright 2013 Advanced Micro Devices, Inc.
+   *
+   * SPDX-License-Identifier: MIT
+   *
+   **************************************************************************/
+      #include "pipe/p_video_codec.h"
+   #include "radeon_vce.h"
+   #include "radeon_video.h"
+   #include "si_pipe.h"
+   #include "util/u_memory.h"
+   #include "util/u_video.h"
+   #include "vl/vl_video_buffer.h"
+      #include <stdio.h>
+      static void session(struct rvce_encoder *enc)
+   {
+      RVCE_BEGIN(0x00000001); // session cmd
    RVCE_CS(enc->stream_handle);
-   RVCE_END();
-}
-
-static void task_info(struct rvce_encoder *enc, uint32_t op, uint32_t dep, uint32_t fb_idx,
-                      uint32_t ring_idx)
-{
-   RVCE_BEGIN(0x00000002); // task info
+      }
+      static void task_info(struct rvce_encoder *enc, uint32_t op, uint32_t dep, uint32_t fb_idx,
+         {
+      RVCE_BEGIN(0x00000002); // task info
    if (op == 0x3) {
       if (enc->task_info_idx) {
-         uint32_t offs = enc->cs.current.cdw - enc->task_info_idx + 3;
-         // Update offsetOfNextTaskInfo
-         enc->cs.current.buf[enc->task_info_idx] = offs;
+      uint32_t offs = enc->cs.current.cdw - enc->task_info_idx + 3;
+   // Update offsetOfNextTaskInfo
       }
-      enc->task_info_idx = enc->cs.current.cdw;
-   }
+      }
    RVCE_CS(0xffffffff); // offsetOfNextTaskInfo
    RVCE_CS(op);         // taskOperation
    RVCE_CS(dep);        // referencePictureDependency
    RVCE_CS(0x00000000); // collocateFlagDependency
    RVCE_CS(fb_idx);     // feedbackIndex
    RVCE_CS(ring_idx);   // videoBitstreamRingIndex
-   RVCE_END();
-}
-
-static void feedback(struct rvce_encoder *enc)
-{
-   RVCE_BEGIN(0x05000005);                                    // feedback buffer
+      }
+      static void feedback(struct rvce_encoder *enc)
+   {
+      RVCE_BEGIN(0x05000005);                                    // feedback buffer
    RVCE_WRITE(enc->fb->res->buf, enc->fb->res->domains, 0x0); // feedbackRingAddressHi/Lo
    RVCE_CS(0x00000001);                                       // feedbackRingSize
-   RVCE_END();
-}
-
-static void create(struct rvce_encoder *enc)
-{
-   enc->task_info(enc, 0x00000000, 0, 0, 0);
-
-   RVCE_BEGIN(0x01000001);                                            // create cmd
+      }
+      static void create(struct rvce_encoder *enc)
+   {
+               RVCE_BEGIN(0x01000001);                                            // create cmd
    RVCE_CS(0x00000000);                                               // encUseCircularBuffer
    RVCE_CS(u_get_h264_profile_idc(enc->base.profile));                // encProfile
    RVCE_CS(enc->base.level);                                          // encLevel
@@ -67,12 +53,10 @@ static void create(struct rvce_encoder *enc)
    RVCE_CS(enc->chroma->u.legacy.level[0].nblk_x * enc->chroma->bpe); // encRefPicChromaPitch
    RVCE_CS(align(enc->luma->u.legacy.level[0].nblk_y, 16) / 8);       // encRefYHeightInQw
    RVCE_CS(0x00000000); // encRefPic(Addr|Array)Mode, encPicStructRestriction, disableRDO
-   RVCE_END();
-}
-
-static void rate_control(struct rvce_encoder *enc)
-{
-   RVCE_BEGIN(0x04000005);                                 // rate control
+      }
+      static void rate_control(struct rvce_encoder *enc)
+   {
+      RVCE_BEGIN(0x04000005);                                 // rate control
    RVCE_CS(enc->pic.rate_ctrl[0].rate_ctrl_method);           // encRateControlMethod
    RVCE_CS(enc->pic.rate_ctrl[0].target_bitrate);             // encRateControlTargetBitRate
    RVCE_CS(enc->pic.rate_ctrl[0].peak_bitrate);               // encRateControlPeakBitRate
@@ -97,24 +81,16 @@ static void rate_control(struct rvce_encoder *enc)
    RVCE_CS(0x00000000);                                    // encBPicsDeltaQP
    RVCE_CS(0x00000000);                                    // encReferenceBPicsDeltaQP
    RVCE_CS(0x00000000);                                    // encRateControlReInitDisable
-   RVCE_END();
-}
-
-static void config_extension(struct rvce_encoder *enc)
-{
-   RVCE_BEGIN(0x04000001); // config extension
+      }
+      static void config_extension(struct rvce_encoder *enc)
+   {
+      RVCE_BEGIN(0x04000001); // config extension
    RVCE_CS(0x00000003);    // encEnablePerfLogging
-   RVCE_END();
-}
-
-static void pic_control(struct rvce_encoder *enc)
-{
-   unsigned encNumMBsPerSlice;
-
-   encNumMBsPerSlice = align(enc->base.width, 16) / 16;
-   encNumMBsPerSlice *= align(enc->base.height, 16) / 16;
-
-   RVCE_BEGIN(0x04000002);                                         // pic control
+      }
+      static void pic_control(struct rvce_encoder *enc)
+   {
+               encNumMBsPerSlice = align(enc->base.width, 16) / 16;
+            RVCE_BEGIN(0x04000002);                                         // pic control
    RVCE_CS(0x00000000);                                            // encUseConstrainedIntraPred
    RVCE_CS(0x00000000);                                            // encCABACEnable
    RVCE_CS(0x00000000);                                            // encCABACIDC
@@ -142,12 +118,10 @@ static void pic_control(struct rvce_encoder *enc)
    RVCE_CS(0x00000001);                            // encNumDefaultActiveRefL1
    RVCE_CS(0x00000000);                            // encSliceMode
    RVCE_CS(0x00000000);                            // encMaxSliceSize
-   RVCE_END();
-}
-
-static void motion_estimation(struct rvce_encoder *enc)
-{
-   RVCE_BEGIN(0x04000007); // motion estimation
+      }
+      static void motion_estimation(struct rvce_encoder *enc)
+   {
+      RVCE_BEGIN(0x04000007); // motion estimation
    RVCE_CS(0x00000001);    // encIMEDecimationSearch
    RVCE_CS(0x00000001);    // motionEstHalfPixel
    RVCE_CS(0x00000000);    // motionEstQuarterPixel
@@ -172,12 +146,10 @@ static void motion_estimation(struct rvce_encoder *enc)
    RVCE_CS(0x00000000);    // fme0_encDisableSubMode
    RVCE_CS(0x00000000);    // fme1_encDisableSubMode
    RVCE_CS(0x00000000);    // imeSWSpeedupEnable
-   RVCE_END();
-}
-
-static void rdo(struct rvce_encoder *enc)
-{
-   RVCE_BEGIN(0x04000008); // rdo
+      }
+      static void rdo(struct rvce_encoder *enc)
+   {
+      RVCE_BEGIN(0x04000008); // rdo
    RVCE_CS(0x00000000);    // encDisableTbePredIFrame
    RVCE_CS(0x00000000);    // encDisableTbePredPFrame
    RVCE_CS(0x00000000);    // useFmeInterpolY
@@ -195,17 +167,11 @@ static void rdo(struct rvce_encoder *enc)
    RVCE_CS(0x00000000);    // encLumaCoeffCost
    RVCE_CS(0x00000000);    // encLumaMBCoeffCost
    RVCE_CS(0x00000000);    // encChromaCoeffCost
-   RVCE_END();
-}
-
-static void vui(struct rvce_encoder *enc)
-{
-   int i;
-
-   if (!enc->pic.rate_ctrl[0].frame_rate_num)
-      return;
-
-   RVCE_BEGIN(0x04000009);                     // vui
+      }
+      static void vui(struct rvce_encoder *enc)
+   {
+               if (!enc->pic.rate_ctrl[0].frame_rate_num)
+            RVCE_BEGIN(0x04000009);                     // vui
    RVCE_CS(0x00000000);                        // aspectRatioInfoPresentFlag
    RVCE_CS(0x00000000);                        // aspectRatioInfo.aspectRatioIdc
    RVCE_CS(0x00000000);                        // aspectRatioInfo.sarWidth
@@ -232,9 +198,8 @@ static void vui(struct rvce_encoder *enc)
    RVCE_CS(0x00000006);                            // hrdParam.cpbSizeScale
    for (i = 0; i < 32; i++) {
       RVCE_CS(0x00000000); // hrdParam.bitRateValueMinus
-      RVCE_CS(0x00000000); // hrdParam.cpbSizeValueMinus
-      RVCE_CS(0x00000000); // hrdParam.cbrFlag
-   }
+   RVCE_CS(0x00000000); // hrdParam.cpbSizeValueMinus
+      }
    RVCE_CS(0x00000017); // hrdParam.initialCpbRemovalDelayLengthMinus1
    RVCE_CS(0x00000017); // hrdParam.cpbRemovalDelayLengthMinus1
    RVCE_CS(0x00000017); // hrdParam.dpbOutputDelayLengthMinus1
@@ -249,38 +214,25 @@ static void vui(struct rvce_encoder *enc)
    RVCE_CS(0x00000010); // bitstreamRestrictions.log2MaxMvLengthVert
    RVCE_CS(0x00000003); // bitstreamRestrictions.numReorderFrames
    RVCE_CS(0x00000003); // bitstreamRestrictions.maxDecFrameBuffering
-   RVCE_END();
-}
-
-static void config(struct rvce_encoder *enc)
-{
-   enc->task_info(enc, 0x00000002, 0, 0xffffffff, 0);
+      }
+      static void config(struct rvce_encoder *enc)
+   {
+      enc->task_info(enc, 0x00000002, 0, 0xffffffff, 0);
    enc->rate_control(enc);
    enc->config_extension(enc);
    enc->motion_estimation(enc);
    enc->rdo(enc);
    if (enc->use_vui)
-      enc->vui(enc);
-   enc->pic_control(enc);
-}
-
-static void encode(struct rvce_encoder *enc)
-{
-   signed luma_offset, chroma_offset;
-   int i;
-
-   enc->task_info(enc, 0x00000003, 0, 0, 0);
-
-   RVCE_BEGIN(0x05000001);                                        // context buffer
+            }
+      static void encode(struct rvce_encoder *enc)
+   {
+      signed luma_offset, chroma_offset;
+                     RVCE_BEGIN(0x05000001);                                        // context buffer
    RVCE_READWRITE(enc->cpb.res->buf, enc->cpb.res->domains, 0x0); // encodeContextAddressHi/Lo
-   RVCE_END();
-
-   RVCE_BEGIN(0x05000004);                             // video bitstream buffer
+            RVCE_BEGIN(0x05000004);                             // video bitstream buffer
    RVCE_WRITE(enc->bs_handle, RADEON_DOMAIN_GTT, 0x0); // videoBitstreamRingAddressHi/Lo
    RVCE_CS(enc->bs_size);                              // videoBitstreamRingSize
-   RVCE_END();
-
-   RVCE_BEGIN(0x03000001); // encode
+            RVCE_BEGIN(0x03000001); // encode
    RVCE_CS(0x00000000);    // insertHeaders
    RVCE_CS(0x00000000);    // pictureStructure
    RVCE_CS(enc->bs_size);  // allowedMaxBitstreamSize
@@ -289,10 +241,8 @@ static void encode(struct rvce_encoder *enc)
    RVCE_CS(0x00000000);    // endOfSequence
    RVCE_CS(0x00000000);    // endOfStream
    RVCE_READ(enc->handle, RADEON_DOMAIN_VRAM,
-             (uint64_t)enc->luma->u.legacy.level[0].offset_256B * 256); // inputPictureLumaAddressHi/Lo
-   RVCE_READ(enc->handle, RADEON_DOMAIN_VRAM,
-             (uint64_t)enc->chroma->u.legacy.level[0].offset_256B * 256);              // inputPictureChromaAddressHi/Lo
-   RVCE_CS(align(enc->luma->u.legacy.level[0].nblk_y, 16));       // encInputFrameYPitch
+         RVCE_READ(enc->handle, RADEON_DOMAIN_VRAM,
+         RVCE_CS(align(enc->luma->u.legacy.level[0].nblk_y, 16));       // encInputFrameYPitch
    RVCE_CS(enc->luma->u.legacy.level[0].nblk_x * enc->luma->bpe); // encInputPicLumaPitch
    RVCE_CS(enc->chroma->u.legacy.level[0].nblk_x * enc->chroma->bpe); // encInputPicChromaPitch
    RVCE_CS(0x00000000);                                               // encInputPic(Addr|Array)Mode
@@ -305,75 +255,55 @@ static void encode(struct rvce_encoder *enc)
    RVCE_CS(0x00000000);                                               // encTemporalLayerIndex
    RVCE_CS(0x00000000); // num_ref_idx_active_override_flag
    RVCE_CS(0x00000000); // num_ref_idx_l0_active_minus1
-   RVCE_CS(0x00000000); // num_ref_idx_l1_active_minus1
-
-   i = enc->pic.frame_num - enc->pic.ref_idx_l0_list[0];
+            i = enc->pic.frame_num - enc->pic.ref_idx_l0_list[0];
    if (i > 1 && enc->pic.picture_type == PIPE_H2645_ENC_PICTURE_TYPE_P) {
       RVCE_CS(0x00000001); // encRefListModificationOp
-      RVCE_CS(i - 1);      // encRefListModificationNum
-   } else {
+      } else {
       RVCE_CS(0x00000000); // encRefListModificationOp
-      RVCE_CS(0x00000000); // encRefListModificationNum
-   }
-
-   for (i = 0; i < 3; ++i) {
+               for (i = 0; i < 3; ++i) {
       RVCE_CS(0x00000000); // encRefListModificationOp
-      RVCE_CS(0x00000000); // encRefListModificationNum
-   }
+      }
    for (i = 0; i < 4; ++i) {
       RVCE_CS(0x00000000); // encDecodedPictureMarkingOp
-      RVCE_CS(0x00000000); // encDecodedPictureMarkingNum
-      RVCE_CS(0x00000000); // encDecodedPictureMarkingIdx
-      RVCE_CS(0x00000000); // encDecodedRefBasePictureMarkingOp
-      RVCE_CS(0x00000000); // encDecodedRefBasePictureMarkingNum
-   }
-
-   // encReferencePictureL0[0]
+   RVCE_CS(0x00000000); // encDecodedPictureMarkingNum
+   RVCE_CS(0x00000000); // encDecodedPictureMarkingIdx
+   RVCE_CS(0x00000000); // encDecodedRefBasePictureMarkingOp
+               // encReferencePictureL0[0]
    RVCE_CS(0x00000000); // pictureStructure
    if (enc->pic.picture_type == PIPE_H2645_ENC_PICTURE_TYPE_P ||
-       enc->pic.picture_type == PIPE_H2645_ENC_PICTURE_TYPE_B) {
-      struct rvce_cpb_slot *l0 = si_l0_slot(enc);
-      si_vce_frame_offset(enc, l0, &luma_offset, &chroma_offset);
-      RVCE_CS(l0->picture_type);  // encPicType
-      RVCE_CS(l0->frame_num);     // frameNumber
-      RVCE_CS(l0->pic_order_cnt); // pictureOrderCount
-      RVCE_CS(luma_offset);       // lumaOffset
-      RVCE_CS(chroma_offset);     // chromaOffset
-   } else {
+      enc->pic.picture_type == PIPE_H2645_ENC_PICTURE_TYPE_B) {
+   struct rvce_cpb_slot *l0 = si_l0_slot(enc);
+   si_vce_frame_offset(enc, l0, &luma_offset, &chroma_offset);
+   RVCE_CS(l0->picture_type);  // encPicType
+   RVCE_CS(l0->frame_num);     // frameNumber
+   RVCE_CS(l0->pic_order_cnt); // pictureOrderCount
+   RVCE_CS(luma_offset);       // lumaOffset
+      } else {
       RVCE_CS(0x00000000); // encPicType
-      RVCE_CS(0x00000000); // frameNumber
-      RVCE_CS(0x00000000); // pictureOrderCount
-      RVCE_CS(0xffffffff); // lumaOffset
-      RVCE_CS(0xffffffff); // chromaOffset
-   }
-
-   // encReferencePictureL0[1]
+   RVCE_CS(0x00000000); // frameNumber
+   RVCE_CS(0x00000000); // pictureOrderCount
+   RVCE_CS(0xffffffff); // lumaOffset
+               // encReferencePictureL0[1]
    RVCE_CS(0x00000000); // pictureStructure
    RVCE_CS(0x00000000); // encPicType
    RVCE_CS(0x00000000); // frameNumber
    RVCE_CS(0x00000000); // pictureOrderCount
    RVCE_CS(0xffffffff); // lumaOffset
-   RVCE_CS(0xffffffff); // chromaOffset
-
-   // encReferencePictureL1[0]
+            // encReferencePictureL1[0]
    RVCE_CS(0x00000000); // pictureStructure
    if (enc->pic.picture_type == PIPE_H2645_ENC_PICTURE_TYPE_B) {
       struct rvce_cpb_slot *l1 = si_l1_slot(enc);
-      si_vce_frame_offset(enc, l1, &luma_offset, &chroma_offset);
-      RVCE_CS(l1->picture_type);  // encPicType
-      RVCE_CS(l1->frame_num);     // frameNumber
-      RVCE_CS(l1->pic_order_cnt); // pictureOrderCount
-      RVCE_CS(luma_offset);       // lumaOffset
-      RVCE_CS(chroma_offset);     // chromaOffset
-   } else {
+   si_vce_frame_offset(enc, l1, &luma_offset, &chroma_offset);
+   RVCE_CS(l1->picture_type);  // encPicType
+   RVCE_CS(l1->frame_num);     // frameNumber
+   RVCE_CS(l1->pic_order_cnt); // pictureOrderCount
+   RVCE_CS(luma_offset);       // lumaOffset
+      } else {
       RVCE_CS(0x00000000); // encPicType
-      RVCE_CS(0x00000000); // frameNumber
-      RVCE_CS(0x00000000); // pictureOrderCount
-      RVCE_CS(0xffffffff); // lumaOffset
-      RVCE_CS(0xffffffff); // chromaOffset
-   }
-
-   si_vce_frame_offset(enc, si_current_slot(enc), &luma_offset, &chroma_offset);
+   RVCE_CS(0x00000000); // frameNumber
+   RVCE_CS(0x00000000); // pictureOrderCount
+   RVCE_CS(0xffffffff); // lumaOffset
+               si_vce_frame_offset(enc, si_current_slot(enc), &luma_offset, &chroma_offset);
    RVCE_CS(luma_offset);            // encReconstructedLumaOffset
    RVCE_CS(chroma_offset);          // encReconstructedChromaOffset
    RVCE_CS(0x00000000);             // encColocBufferOffset
@@ -389,26 +319,17 @@ static void encode(struct rvce_encoder *enc)
    RVCE_CS(0x00000000);             // numBPicRemainInRCGOP
    RVCE_CS(0x00000000);             // numIRPicRemainInRCGOP
    RVCE_CS(0x00000000);             // enableIntraRefresh
-   RVCE_END();
-}
-
-static void destroy(struct rvce_encoder *enc)
-{
-   enc->task_info(enc, 0x00000001, 0, 0, 0);
-
-   feedback(enc);
-
-   RVCE_BEGIN(0x02000001); // destroy
-   RVCE_END();
-}
-
-void si_vce_40_2_2_get_param(struct rvce_encoder *enc, struct pipe_h264_enc_picture_desc *pic)
-{
-}
-
-void si_vce_40_2_2_init(struct rvce_encoder *enc)
-{
-   enc->session = session;
+      }
+      static void destroy(struct rvce_encoder *enc)
+   {
+                        RVCE_BEGIN(0x02000001); // destroy
+      }
+      void si_vce_40_2_2_get_param(struct rvce_encoder *enc, struct pipe_h264_enc_picture_desc *pic)
+   {
+   }
+      void si_vce_40_2_2_init(struct rvce_encoder *enc)
+   {
+      enc->session = session;
    enc->task_info = task_info;
    enc->create = create;
    enc->feedback = feedback;
@@ -421,5 +342,4 @@ void si_vce_40_2_2_init(struct rvce_encoder *enc)
    enc->config = config;
    enc->encode = encode;
    enc->destroy = destroy;
-   enc->si_get_pic_param = si_vce_40_2_2_get_param;
-}
+      }

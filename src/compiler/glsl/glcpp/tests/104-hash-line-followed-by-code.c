@@ -1,2 +1,2 @@
-#line 2
-int foo();
+   #line 2
+   int foo();

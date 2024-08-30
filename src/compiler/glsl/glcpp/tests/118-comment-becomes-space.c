@@ -1,4 +1,3 @@
-#define FOO first/*
-*/second
-
-FOO
+   #define FOO first/*
+   */second
+      FOO

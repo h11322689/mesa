@@ -1,3 +1,3 @@
-#define failure() success
-#define foo failure
-foo()
+   #define failure() success
+   #define foo failure
+   foo()
